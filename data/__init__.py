@@ -15,7 +15,7 @@ mode_list = ['train', 'val', 'test']
 def get_dataloader(
         mode : str,
         img_path_list : List[str],
-        label_list : Optional(List[str])
+        label_list : Optional[List[str]]
     ) -> DataLoader :
     
     if mode not in mode_list :
