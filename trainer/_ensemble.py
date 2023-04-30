@@ -12,25 +12,23 @@ from ._trainer import TRAINER
 class ENSEMBLE() : ### just using voting mechanism
     def __init__( self, 
         model_list : List[nn.Module],
-        trainloader : DataLoader,
-        valloader : DataLoader,
-        testloader : DataLoader, 
+        dataloaders : DataLoader,
         device : torch.device,
         best_model_name : str = 'best_model',
-        optimizer : str = 'Adam',
-        loss : str = 'celoss',
-        score : str = 'f1score',
+        optimizer : str = CONFIG.OPTIMIZER,
+        loss : str = CONFIG.LOSS,
+        score : str = CONFIG.SCORE,
         scheduler : Optional[str] = None, 
     ):
         self.trainer_list = [
                 TRAINER(
                     model = _model,
-                    trainloader = trainloader,
-                    valloader = valloader,
-                    testloader = testloader,
+                    dataloader = dataloaders,
                     device = device,
                     best_model_name = best_model_name + str(idx),
                     optimizer = optimizer,
+                    loss = loss,
+                    score = score,
                     scheduler = scheduler
             ) for idx, _model in enumerate(model_list)
         ]

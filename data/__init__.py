@@ -1,7 +1,8 @@
-from typing import List, Union, Tuple, Optional
+from typing import List, Dict, Union, Tuple, Optional
 import glob
 import os 
 
+from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 
 from .utils import CONFIG
@@ -43,7 +44,7 @@ def get_dataloader(
 
 def get_data_list(
         mode : str
-    ) -> Union[Tuple(List[str], None), Tuple[List[str], List[str]]] :
+    ) -> Union[Tuple[List[str], None], Tuple[List[str], List[str]]] :
     
     if mode == 'train' :
         TRAIN_DATA_PATH = os.path.join(CONFIG.DATA_PATH, 'train', '*', '*')
@@ -62,16 +63,32 @@ def get_data_list(
 
         return img_list, None
     
-def get_all_dataloader() :
-    dataloader_dict = list()
-    for mode in mode_list :
-        img_list, label_list = get_data_list
-        dataloader = get_dataloader(mode = mode,
-                       img_path_list = img_list,
-                       label_list = label_list)
-        
-        dataloader_dict[mode] = dataloader
+def get_all_dataloader(
+        val_size : float = 0.1
+    ) -> Dict[DataLoader] :
+    dataloader_dict = dict()
+    datalist_dict = dict()
+    for mode in ['train', 'test'] :
+        img_list, label_list = get_data_list( mode = mode )
 
+        if mode == 'train' :
+            train_img_list, val_img_list, train_label_list, val_label_list = train_test_split(
+                img_list, label_list, test_size = val_size
+            )
+
+            datalist_dict['train'] = [train_img_list, train_label_list]
+            datalist_dict['val'] = [val_img_list, val_label_list]
+
+        else :
+            datalist_dict[mode] = [img_list, label_list]
+
+
+    for mode in mode_list :
+        img_list, label_list = datalist_dict[mode]
+        dataloader_dict[mode] = get_dataloader(mode = mode,
+                    img_path_list = img_list,
+                    label_list = label_list)
+    
     return dataloader_dict
 
 __all__.extend([get_dataloader, get_data_list, get_all_dataloader])

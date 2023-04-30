@@ -4,7 +4,7 @@ import torch.nn as nn
 class BaseModel(nn.Module):
     def __init__(
         self, 
-        num_classes : int = 10,
+        num_classes : int = 19,
         pretrained : bool = True,
         **kwargs
     ):

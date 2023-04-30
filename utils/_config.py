@@ -26,6 +26,8 @@ class CONFIG :
         for key, val in CLASS_DICT.items()
     }
 
+
+
     ## config for hyperparameters
     
     EPOCHS = 20
@@ -34,9 +36,15 @@ class CONFIG :
     SEED = 41
     PATIENCE = 4
 
+    OPTIMIZER = 'Adam'
+    LOSS = 'celoss'
+    SCORE = 'f1score'
+
+
     ## ETC
 
     NUM_WORKER = 2
+
 
 def config_init(
         cfg: Optional[Dict]

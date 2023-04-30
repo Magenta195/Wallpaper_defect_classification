@@ -18,20 +18,18 @@ from ._metric import _get_loss_func, _get_score_func
 class TRAINER() :
     def __init__( self, 
         model : nn.Module,
-        trainloader : DataLoader,
-        valloader : DataLoader,
-        testloader : DataLoader, 
+        dataloaders : DataLoader, 
         device : torch.device,
         best_model_name : str = 'best_model',
-        optimizer : str = 'Adam',
-        loss : str = 'celoss',
-        score : str = 'f1score',
+        optimizer : str = CONFIG.OPTIMIZER,
+        loss : str = CONFIG.LOSS,
+        score : str = CONFIG.SCORE,
         scheduler : Optional[str] = None, 
     ):
         self.model = model
-        self.trainloader = trainloader
-        self.valloader = valloader
-        self.testloader = testloader
+        self.trainloader = dataloaders['train']
+        self.valloader = dataloaders['val']
+        self.testloader = dataloaders['test']
         
 
         self.optimizer = _get_optimizer(
