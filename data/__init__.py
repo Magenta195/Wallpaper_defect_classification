@@ -4,7 +4,7 @@ import os
 
 from torch.utils.data import DataLoader
 
-from utils import CONFIG
+from .utils import CONFIG
 from ._dset import *
 from ._argumentation import *
 

@@ -1,6 +1,6 @@
 import torch.nn as nn
 from sklearn.metrics import f1_score
-from utils import CONFIG
+from .utils import CONFIG
 
 loss_dict = {
     'celoss' : nn.CrossEntropyLoss,

@@ -10,7 +10,7 @@ import torch.nn as nn
 import torch
 from torch.utils.data import DataLoader
 
-from utils import CONFIG
+from .utils import CONFIG
 from ._optimizer import _get_optimizer
 from ._scheduler import _get_scheduler
 from ._metric import _get_loss_func, _get_score_func
