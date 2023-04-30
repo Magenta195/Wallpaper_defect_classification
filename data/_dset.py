@@ -1,14 +1,9 @@
-import os
-import glob
+import cv2
 
 from torch.utils.data import Dataset
-from utils import CONFIG
 
-
-
-
-class CustomDataset(Dataset):
-    def __init__(self, transforms=None):
+class WallPaperDataset(Dataset):
+    def __init__(self, img_path_list, label_list, transforms=None):
         self.img_path_list = img_path_list
         self.label_list = label_list
         self.transforms = transforms
@@ -26,10 +21,6 @@ class CustomDataset(Dataset):
             return image, label
         else:
             return image
-        
-    def _get_data_list(self) :
-        MODE_DATAPATH = os.path.join(CONFIG.DATA_PATH, 'train', '*', '*')
-        train_ glob.glob(TRAIN_DATAPATH)
         
     def __len__(self):
         return len(self.img_path_list)

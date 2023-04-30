@@ -1,4 +1,5 @@
 
+import os
 from typing import Optional
 from tqdm import tqdm
 
@@ -10,6 +11,9 @@ import torch
 from torch.utils.data import DataLoader
 
 from utils import CONFIG
+from ._optimizer import _get_optimizer
+from ._scheduler import _get_scheduler
+from ._metric import _get_loss_func, _get_score_func
 
 class TRAINER() :
     def __init__( self, 
@@ -18,20 +22,43 @@ class TRAINER() :
         valloader : DataLoader,
         testloader : DataLoader, 
         device : torch.device,
-        scheduler : Optional[any],     
+        best_model_name : str = 'best_model',
+        optimizer : str = 'Adam',
+        loss : str = 'celoss',
+        score : str = 'f1score',
+        scheduler : Optional[str] = None, 
     ):
         self.model = model
         self.trainloader = trainloader
         self.valloader = valloader
         self.testloader = testloader
-        self.scheduler = scheduler
+        
+
+        self.optimizer = _get_optimizer(
+            opt_name = optimizer,
+            model_param = self.model
+        )
+        self.scheduler = _get_scheduler(
+            scheduler_name = scheduler,
+            optimizer = self.optimizer
+        )
+        self.criterion = _get_loss_func(
+            loss_name = loss
+        )
+        self.score_func = _get_score_func(
+            score_name = score
+        )
         self.device = device
 
+        self.MODEL_SAVE_PATH = os.path.join(CONFIG.MODEL_SAVE_PATH, best_model_name + '.pth')
         self.cur_patience = 0
+        self.softmax_for_predict = nn.Softmax()
 
         self.cur_score = -float('inf')
         self.best_score = -float('inf')
 
+        self.model.to(self.device)
+        self.optimizer.to(self.device)
 
     def _train_one_epoch( self ) :
         self.model.train()
@@ -50,7 +77,7 @@ class TRAINER() :
             loss.backward()
             self.optimizer.step()
             
-            self._train_loss.append(loss.item())
+            train_loss_list.append(loss.item())
 
         self.train_loss = np.mean(train_loss_list)
 
@@ -72,13 +99,14 @@ class TRAINER() :
                 preds += pred.argmax(1).detach().cpu().numpy().tolist()
                 true_labels += labels.detach().cpu().numpy().tolist()
                 
-                self._val_loss.append(loss.item())
-            
+                val_loss_list.append(loss.item())
+        
+        self.cur_score = self.score_func(true_labels, preds, average = 'weighted')
         self.val_loss = np.mean(val_loss_list)
 
     def _save_best_model( self ) :
         if self.cur_score < self.best_score :
-            torch.save(self.model, CONFIG.MODEL_SAVE_PATH)
+            torch.save(self.model, self.MODEL_SAVE_PATH)
             print("detected new best model, model save....")
             self.cur_patience = 0
         else :
@@ -106,19 +134,26 @@ class TRAINER() :
             self.scheduler.step()
 
     def make_predict( self ) :
-
+        self.model = torch.load(self.MODEL_SAVE_PATH)
         self.model.eval()
         preds = []
         with torch.no_grad():
             for imgs in tqdm(self.testloader):
                 imgs = imgs.to(self.device)
                 
-                pred = self.model(imgs)
+                pred = self.softmax_for_predict(self.model(imgs))
                 
-                preds += pred.argmax(1).detach().cpu().numpy().tolist()
+                preds.append(pred.detach().cpu().numpy())
+        preds = np.concatenate(preds, axis = 0)
+        return preds
 
-        submit_df = pd.read_csv(CONFIG.SUBMIT_PATH)
+    def make_predict_file( self ) :
+        preds = self.make_predict()
+        preds = np.argmax(preds, axis = 1)
+
+        preds = [ CONFIG.INV_CLASS_DICT[pred] for pred in preds ]
+
+        submit_df = pd.read_csv( CONFIG.SUBMIT_PATH )
         submit_df['label'] = preds
-        submit_df.to_csv(CONFIG.OUTPUT_PATH, index=False)
-
+        submit_df.to_csv( CONFIG.OUTPUT_PATH, index=False )
     
