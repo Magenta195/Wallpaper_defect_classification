@@ -26,7 +26,6 @@ class ENSEMBLE() : ### just using voting mechanism
                     device = device,
                     cfg = cfg,
                     best_model_name = best_model_name + str(idx),
-                    scheduler = scheduler
             ) for idx, _model in enumerate(model_list)
         ]
         
