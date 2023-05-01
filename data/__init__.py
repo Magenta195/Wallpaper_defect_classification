@@ -1,6 +1,7 @@
 from typing import List, Dict, Union, Tuple, Optional, Type
 import glob
 import os 
+import unicodedata
 
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
@@ -55,7 +56,11 @@ def get_data_list(
 
         for img_dir in img_list :
             label_name = str(img_dir).split('/')[-2]
-            label_list.append(cfg.CLASS_DICT[label_name])
+            try :
+                label = cfg.CLASS_DICT[label_name]
+            except :
+                label = cfg.CLASS_DICT[unicodedata.normalize('NFC', label_name)]
+            label_list.append(label)
 
         return img_list, label_list
 
