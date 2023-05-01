@@ -32,13 +32,13 @@ class WallPaperDataset(Dataset):
         self.img_list = list()
         for img_path in tqdm(img_path_list) :
             image = Image.open(img_path)
-            if self.transforms is not None:
-                image = self.transforms(image)
-
             self.img_list.append(image)
         
     def __getitem__(self, index):
         image = self.img_list[index]
+
+        if self.transforms is not None:
+            image = self.transforms(image)
         
         if self.label_list is not None:
             label = self.label_list[index]
