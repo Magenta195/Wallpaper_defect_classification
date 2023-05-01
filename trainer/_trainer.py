@@ -53,7 +53,6 @@ class TRAINER() :
         self.best_score = -float('inf')
 
         self.model.to(self.device)
-        self.optimizer.to(self.device)
 
     def _train_one_epoch( self ) :
         self.model.train()
