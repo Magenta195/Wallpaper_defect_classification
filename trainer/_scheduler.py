@@ -15,6 +15,7 @@ scheduler_dict = {
 def _get_scheduler(
         scheduler_name : str,
         optimizer : nn.Module,
+        cfg : CONFIG,
         **kwargs
     ) -> Union[nn.Module, None] :
 

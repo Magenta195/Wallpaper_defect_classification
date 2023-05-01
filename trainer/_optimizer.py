@@ -13,6 +13,7 @@ optimizer_dict = {
 def _get_optimizer(
         opt_name : str,
         model_param : any,
+        cfg : CONFIG,
         **kwargs
     ) -> nn.Module :
 
@@ -20,5 +21,5 @@ def _get_optimizer(
         raise NotImplementedError("Invaild Optimizer")
     
     return optimizer_dict[opt_name]( params = model_param,
-                                    lr = CONFIG.LEARNING_RATE,
+                                    lr = cfg.LEARNING_RATE,
                                     **kwargs )

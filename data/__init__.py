@@ -15,6 +15,7 @@ mode_list = ['train', 'val', 'test']
 
 def get_dataloader(
         mode : str,
+        cfg : CONFIG,
         img_path_list : List[str],
         label_list : Optional[List[str]]
     ) -> DataLoader :
@@ -23,10 +24,10 @@ def get_dataloader(
         raise ValueError("Invaild DataLoader Type")
     
     if mode == 'train' :
-        transform = train_transforms()
+        transform = train_transforms( cfg = cfg )
         shuffle = True
     else :
-        transform = test_transforms()
+        transform = test_transforms( cfg = cfg )
         shuffle = False
 
     dataset = WallPaperDataset(
@@ -37,39 +38,41 @@ def get_dataloader(
 
     return DataLoader(
         dataset = dataset,
-        batch_size = CONFIG.BATCH_SIZE,
+        batch_size = cfg.BATCH_SIZE,
         shuffle = shuffle,
-        num_workers = CONFIG.NUM_WORKER
+        num_workers = cfg.NUM_WORKER
     )
 
 def get_data_list(
-        mode : str
+        mode : str,
+        cfg : CONFIG,
     ) -> Union[Tuple[List[str], None], Tuple[List[str], List[str]]] :
     
     if mode == 'train' :
-        TRAIN_DATA_PATH = os.path.join(CONFIG.DATA_PATH, 'train', '*', '*')
+        TRAIN_DATA_PATH = os.path.join(cfg.DATA_PATH, 'train', '*', '*')
         img_list = glob.glob(TRAIN_DATA_PATH)
         label_list  = list()
 
         for img_dir in img_list :
             label_name = str(img_dir).split('/')[-2]
-            label_list.append(CONFIG.CLASS_DICT[label_name])
+            label_list.append(cfg.CLASS_DICT[label_name])
 
         return img_list, label_list
 
     else :
-        TEST_DATA_PATH = os.path.join(CONFIG.DATA_PATH, 'test', '*')
+        TEST_DATA_PATH = os.path.join(cfg.DATA_PATH, 'test', '*')
         img_list = glob.glob(TEST_DATA_PATH)
 
         return img_list, None
     
 def get_all_dataloader(
-        val_size : float = 0.1
+        cfg : CONFIG,
+        val_size : float = 0.1,
     ) -> Dict[str, DataLoader] :
     dataloader_dict = dict()
     datalist_dict = dict()
     for mode in ['train', 'test'] :
-        img_list, label_list = get_data_list( mode = mode )
+        img_list, label_list = get_data_list( mode = mode, cfg = cfg )
 
         if mode == 'train' :
             train_img_list, val_img_list, train_label_list, val_label_list = train_test_split(
@@ -87,7 +90,9 @@ def get_all_dataloader(
 
     for mode in mode_list :
         img_list, label_list = datalist_dict[mode]
-        dataloader_dict[mode] = get_dataloader(mode = mode,
+        dataloader_dict[mode] = get_dataloader(
+                    mode = mode,
+                    cfg = cfg,
                     img_path_list = img_list,
                     label_list = label_list)
     

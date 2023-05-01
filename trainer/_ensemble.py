@@ -14,21 +14,18 @@ class ENSEMBLE() : ### just using voting mechanism
         model_list : List[nn.Module],
         dataloaders : DataLoader,
         device : torch.device,
+        cfg : CONFIG,
         best_model_name : str = 'best_model',
-        optimizer : str = CONFIG.OPTIMIZER,
-        loss : str = CONFIG.LOSS,
-        score : str = CONFIG.SCORE,
         scheduler : Optional[str] = None, 
     ):
+        self.cfg = cfg
         self.trainer_list = [
                 TRAINER(
                     model = _model,
                     dataloader = dataloaders,
                     device = device,
+                    cfg = cfg,
                     best_model_name = best_model_name + str(idx),
-                    optimizer = optimizer,
-                    loss = loss,
-                    score = score,
                     scheduler = scheduler
             ) for idx, _model in enumerate(model_list)
         ]
@@ -63,8 +60,8 @@ class ENSEMBLE() : ### just using voting mechanism
         preds = self.make_predict( mode )
         preds = np.argmax(preds, axis = 1)
 
-        preds = [ CONFIG.INV_CLASS_DICT[pred] for pred in preds ]
+        preds = [ self.cfg.INV_CLASS_DICT[pred] for pred in preds ]
 
-        submit_df = pd.read_csv( CONFIG.SUBMIT_PATH )
+        submit_df = pd.read_csv( self.cfg.SUBMIT_PATH )
         submit_df['label'] = preds
-        submit_df.to_csv( CONFIG.OUTPUT_PATH, index=False )
+        submit_df.to_csv( self.cfg.OUTPUT_PATH, index=False )

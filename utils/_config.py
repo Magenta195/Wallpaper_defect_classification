@@ -26,8 +26,6 @@ class CONFIG :
         for key, val in CLASS_DICT.items()
     }
 
-
-
     ## config for hyperparameters
     
     EPOCHS = 20
@@ -48,10 +46,12 @@ class CONFIG :
 
 def config_init(
         cfg: Optional[Dict]
-    ) ->  None:
+    ) ->  CONFIG:
     try :
         for key, val in cfg.items() :
             setattr(CONFIG, key, val)
     
     except :
         print("Set Default config setting")
+
+    return CONFIG

@@ -20,31 +20,32 @@ class TRAINER() :
         model : nn.Module,
         dataloaders : DataLoader, 
         device : torch.device,
+        cfg : CONFIG,
         best_model_name : str = 'best_model',
-        optimizer : str = CONFIG.OPTIMIZER,
-        loss : str = CONFIG.LOSS,
-        score : str = CONFIG.SCORE,
-        scheduler : Optional[str] = None, 
     ):
         self.model = model
         self.trainloader = dataloaders['train']
         self.valloader = dataloaders['val']
         self.testloader = dataloaders['test']
-        
+        self.cfg = cfg
 
         self.optimizer = _get_optimizer(
-            opt_name = optimizer,
-            model_param = self.model
+            opt_name = cfg.OPTIMIZER,
+            model_param = self.model,
+            cfg = cfg
         )
         self.scheduler = _get_scheduler(
-            scheduler_name = scheduler,
-            optimizer = self.optimizer
+            scheduler_name = cfg.SCHEDULER,
+            optimizer = self.optimizer,
+            cfg = cfg
         )
         self.criterion = _get_loss_func(
-            loss_name = loss
+            loss_name = cfg.LOSS,
+            cfg = cfg
         )
         self.score_func = _get_score_func(
-            score_name = score
+            score_name = cfg.SCORE,
+            cfg = cfg
         )
         self.device = device
 
@@ -111,10 +112,10 @@ class TRAINER() :
             self.cur_patience += 1
 
     def _early_stopping( self ) :
-        if CONFIG.PATIENCE == 0 :
+        if self.cfg.PATIENCE == 0 :
             return False
         
-        return self.cur_patience >= CONFIG.PATIENCE
+        return self.cur_patience >= self.cfg.PATIENCE
         
 
     def full_train( self ) :
@@ -149,9 +150,9 @@ class TRAINER() :
         preds = self.make_predict()
         preds = np.argmax(preds, axis = 1)
 
-        preds = [ CONFIG.INV_CLASS_DICT[pred] for pred in preds ]
+        preds = [ self.cfg.INV_CLASS_DICT[pred] for pred in preds ]
 
-        submit_df = pd.read_csv( CONFIG.SUBMIT_PATH )
+        submit_df = pd.read_csv( self.cfg.SUBMIT_PATH )
         submit_df['label'] = preds
-        submit_df.to_csv( CONFIG.OUTPUT_PATH, index=False )
+        submit_df.to_csv( self.cfg.OUTPUT_PATH, index=False )
     

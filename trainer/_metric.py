@@ -13,6 +13,7 @@ score_dict = {
 
 def _get_loss_func(
         loss_name : str,
+        cfg : CONFIG,
         **kwargs
     ) -> nn.Module :
 
@@ -24,6 +25,7 @@ def _get_loss_func(
 
 def _get_score_func(
         score_name : str,
+        cfg : CONFIG,
         **kwargs
     ) -> float :
 
