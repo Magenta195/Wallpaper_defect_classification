@@ -1,3 +1,5 @@
+from typing import Type
+
 import torch.nn as nn
 from sklearn.metrics import f1_score
 from .utils import CONFIG
@@ -12,24 +14,22 @@ score_dict = {
 }
 
 def _get_loss_func(
-        loss_name : str,
-        cfg : CONFIG,
+        cfg : Type[CONFIG],
         **kwargs
     ) -> nn.Module :
 
-    if loss_name not in loss_dict :
+    if cfg.LOSS not in loss_dict :
         raise NotImplementedError("Invaild Loss Fucntion")
     
-    return loss_dict[loss_name]( **kwargs )
+    return loss_dict[cfg.LOSS]( **kwargs )
 
 
 def _get_score_func(
-        score_name : str,
         cfg : CONFIG,
         **kwargs
     ) -> float :
 
-    if score_name not in score_dict :
+    if cfg.SCORE not in score_dict :
         raise NotImplementedError("Invaild Score Function")
     
-    return score_dict[score_name]
+    return score_dict[cfg.SCORE]

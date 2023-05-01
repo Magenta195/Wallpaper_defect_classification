@@ -1,6 +1,6 @@
 
 import os
-from typing import Optional
+from typing import Optional, Type
 from tqdm import tqdm
 
 import numpy as np
@@ -20,7 +20,7 @@ class TRAINER() :
         model : nn.Module,
         dataloaders : DataLoader, 
         device : torch.device,
-        cfg : CONFIG,
+        cfg : Type[CONFIG],
         best_model_name : str = 'best_model',
     ):
         self.model = model
@@ -30,26 +30,22 @@ class TRAINER() :
         self.cfg = cfg
 
         self.optimizer = _get_optimizer(
-            opt_name = cfg.OPTIMIZER,
             model_param = self.model,
             cfg = cfg
         )
         self.scheduler = _get_scheduler(
-            scheduler_name = cfg.SCHEDULER,
             optimizer = self.optimizer,
             cfg = cfg
         )
         self.criterion = _get_loss_func(
-            loss_name = cfg.LOSS,
             cfg = cfg
         )
         self.score_func = _get_score_func(
-            score_name = cfg.SCORE,
             cfg = cfg
         )
         self.device = device
 
-        self.MODEL_SAVE_PATH = os.path.join(CONFIG.MODEL_SAVE_PATH, best_model_name + '.pth')
+        self.MODEL_SAVE_PATH = os.path.join(self.cfg.MODEL_SAVE_PATH, best_model_name + '.pth')
         self.cur_patience = 0
         self.softmax_for_predict = nn.Softmax()
 
@@ -122,7 +118,7 @@ class TRAINER() :
         self.train_loss_list = list()
         self.val_loss_list = list()
 
-        for i in range( 1, CONFIG.EPOCHS+1 ) :
+        for i in range( 1, self.cfg.EPOCHS+1 ) :
             self._train_one_epoch()
             self._val_one_epoch()
             self._save_best_model()

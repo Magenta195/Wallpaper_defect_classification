@@ -1,4 +1,6 @@
 
+from typing import Type
+
 import torch.nn as nn
 import torch.optim
 
@@ -11,15 +13,14 @@ optimizer_dict = {
 }
 
 def _get_optimizer(
-        opt_name : str,
         model_param : any,
-        cfg : CONFIG,
+        cfg : Type[CONFIG],
         **kwargs
     ) -> nn.Module :
 
-    if opt_name not in optimizer_dict :
+    if cfg.OPTIMIZER not in optimizer_dict :
         raise NotImplementedError("Invaild Optimizer")
     
-    return optimizer_dict[opt_name]( params = model_param,
+    return optimizer_dict[cfg.OPTIMIZER]( params = model_param,
                                     lr = cfg.LEARNING_RATE,
                                     **kwargs )

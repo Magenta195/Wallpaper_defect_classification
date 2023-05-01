@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Type
 
 import pandas as pd
 import numpy as np
@@ -14,7 +14,7 @@ class ENSEMBLE() : ### just using voting mechanism
         model_list : List[nn.Module],
         dataloaders : DataLoader,
         device : torch.device,
-        cfg : CONFIG,
+        cfg : Type[CONFIG],
         best_model_name : str = 'best_model',
         scheduler : Optional[str] = None, 
     ):

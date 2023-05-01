@@ -1,11 +1,13 @@
 
+from typing import Type
+
 import torch.nn as nn
 from torchvision import transforms
 from .utils import CONFIG
     
 
 def train_transforms(
-        cfg : CONFIG,
+        cfg : Type[CONFIG],
 ) -> nn.Sequential :
     return transforms.Compose(
     [transforms.RandomResizedCrop((cfg.IMG_SIZE, cfg.IMG_SIZE), scale=(0.8, 1.0)),
@@ -19,7 +21,9 @@ def train_transforms(
      #transforms.Normalize((0.485), (0.229))
     ])
 
-def test_transforms() -> nn.Sequential :
+def test_transforms(
+        cfg : Type[CONFIG],
+) -> nn.Sequential :
     return transforms.Compose(
     [transforms.Resize((cfg.IMG_SIZE, cfg.IMG_SIZE)),
      #transforms.Grayscale(num_output_channels=3),

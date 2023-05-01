@@ -1,4 +1,4 @@
-from typing import List, Dict, Union, Tuple, Optional
+from typing import List, Dict, Union, Tuple, Optional, Type
 import glob
 import os 
 
@@ -15,7 +15,7 @@ mode_list = ['train', 'val', 'test']
 
 def get_dataloader(
         mode : str,
-        cfg : CONFIG,
+        cfg : Type[CONFIG],
         img_path_list : List[str],
         label_list : Optional[List[str]]
     ) -> DataLoader :
@@ -45,7 +45,7 @@ def get_dataloader(
 
 def get_data_list(
         mode : str,
-        cfg : CONFIG,
+        cfg : Type[CONFIG],
     ) -> Union[Tuple[List[str], None], Tuple[List[str], List[str]]] :
     
     if mode == 'train' :
@@ -66,7 +66,7 @@ def get_data_list(
         return img_list, None
     
 def get_all_dataloader(
-        cfg : CONFIG,
+        cfg : Type[CONFIG],
         val_size : float = 0.1,
     ) -> Dict[str, DataLoader] :
     dataloader_dict = dict()

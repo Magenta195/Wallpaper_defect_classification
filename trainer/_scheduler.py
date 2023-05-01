@@ -1,5 +1,5 @@
 
-from typing import Union
+from typing import Union, Type
 
 import torch.nn as nn
 import torch.optim
@@ -13,15 +13,14 @@ scheduler_dict = {
 }
 
 def _get_scheduler(
-        scheduler_name : str,
         optimizer : nn.Module,
-        cfg : CONFIG,
+        cfg : Type[CONFIG],
         **kwargs
     ) -> Union[nn.Module, None] :
 
-    if scheduler_name not in scheduler_dict :
+    if cfg.SCHEDULER not in scheduler_dict :
         print("Invaild Scheduler, Set scheduler as None...")
         return None
     
-    return scheduler_dict[scheduler_name]( optimizer = optimizer,
+    return scheduler_dict[cfg.SCHEDULER]( optimizer = optimizer,
                                     **kwargs )

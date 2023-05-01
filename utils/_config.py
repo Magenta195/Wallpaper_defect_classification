@@ -37,7 +37,7 @@ class CONFIG :
     OPTIMIZER = 'Adam'
     LOSS = 'celoss'
     SCORE = 'f1score'
-
+    SCHEDULER = None
 
     ## ETC
 
