@@ -31,7 +31,7 @@ class WallPaperDataset(Dataset):
         self.transforms = transforms
         self.img_list = list()
         for img_path in img_path_list :
-            image = Image.opne(img_path)
+            image = Image.open(img_path)
             if self.transforms is not None:
                 image = self.transforms(image)
 
