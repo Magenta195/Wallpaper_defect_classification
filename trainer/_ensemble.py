@@ -22,7 +22,7 @@ class ENSEMBLE() : ### just using voting mechanism
         self.trainer_list = [
                 TRAINER(
                     model = _model,
-                    dataloader = dataloaders,
+                    dataloaders = dataloaders,
                     device = device,
                     cfg = cfg,
                     best_model_name = best_model_name + str(idx),

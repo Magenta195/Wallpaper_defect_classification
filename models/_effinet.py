@@ -7,6 +7,10 @@ eff_model_dict = {
     'b1' : models.efficientnet_b1,
     'b2' : models.efficientnet_b2,
     'b3' : models.efficientnet_b3,
+    'b4' : models.efficientnet_b4,
+    'b5' : models.efficientnet_b5,
+    'b6' : models.efficientnet_b6,
+    'b7' : models.efficientnet_b7,
 }
 class BaseModel(nn.Module):
     def __init__(

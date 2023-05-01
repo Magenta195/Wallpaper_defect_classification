@@ -102,6 +102,7 @@ class TRAINER() :
         if self.cur_score > self.best_score :
             torch.save(self.model, self.MODEL_SAVE_PATH)
             print("detected new best model, model save....")
+            self.best_score = self.cur_score
             self.cur_patience = 0
         else :
             self.cur_patience += 1
