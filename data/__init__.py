@@ -65,7 +65,7 @@ def get_data_list(
     
 def get_all_dataloader(
         val_size : float = 0.1
-    ) -> Dict[DataLoader] :
+    ) -> Dict[str, DataLoader] :
     dataloader_dict = dict()
     datalist_dict = dict()
     for mode in ['train', 'test'] :
