@@ -9,8 +9,8 @@ from .utils import CONFIG
 def train_transforms(
         cfg : Type[CONFIG],
 ) -> nn.Sequential :
-    return nn.Sequential(
-     transforms.RandomResizedCrop((cfg.IMG_SIZE, cfg.IMG_SIZE), scale=(0.8, 1.0)),
+    return transforms.Compose(
+    [transforms.RandomResizedCrop((cfg.IMG_SIZE, cfg.IMG_SIZE), scale=(0.8, 1.0)),
      #transforms.Grayscale(num_output_channels=3),
      transforms.RandomRotation(30),
      transforms.RandomHorizontalFlip(p=0.5),
@@ -19,15 +19,15 @@ def train_transforms(
      transforms.ToTensor(),
      transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
      #transforms.Normalize((0.485), (0.229))
-    )
+    ])
 
 def test_transforms(
         cfg : Type[CONFIG],
 ) -> nn.Sequential :
-    return nn.Sequential(
-     transforms.Resize((cfg.IMG_SIZE, cfg.IMG_SIZE)),
+    return transforms.Compose(
+    [transforms.Resize((cfg.IMG_SIZE, cfg.IMG_SIZE)),
      #transforms.Grayscale(num_output_channels=3),
      transforms.ToTensor(),
      transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
      #transforms.Normalize((0.485), (0.229))
-    )
+    ])
