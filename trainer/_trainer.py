@@ -30,7 +30,7 @@ class TRAINER() :
         self.cfg = cfg
 
         self.optimizer = _get_optimizer(
-            model_param = self.model,
+            model_param = self.model.parameters(),
             cfg = cfg
         )
         self.scheduler = _get_scheduler(
