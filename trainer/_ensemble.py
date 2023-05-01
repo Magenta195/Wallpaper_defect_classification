@@ -31,7 +31,8 @@ class ENSEMBLE() : ### just using voting mechanism
         ]
         
     def train_all( self ) :
-        for trainer in self.trainer_list :
+        for idx, trainer in enumerate(self.trainer_list) :
+            print('[Model {:03d} training start]'.format(idx + 1))
             trainer.full_train()
 
     def make_predict( 
