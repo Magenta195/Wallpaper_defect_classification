@@ -73,7 +73,9 @@ def get_all_dataloader(
 
         if mode == 'train' :
             train_img_list, val_img_list, train_label_list, val_label_list = train_test_split(
-                img_list, label_list, test_size = val_size
+                img_list, label_list, 
+                test_size = val_size,
+                train_size = 1 - val_size,
             )
 
             datalist_dict['train'] = [train_img_list, train_label_list]
