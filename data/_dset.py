@@ -1,4 +1,4 @@
-import cv2
+from PIL import Image
 
 from torch.utils.data import Dataset
 
@@ -11,7 +11,7 @@ class WallPaperDataset(Dataset):
     def __getitem__(self, index):
         img_path = self.img_path_list[index]
         
-        image = cv2.imread(img_path)
+        image = Image.open(img_path)
         
         if self.transforms is not None:
             image = self.transforms(image)

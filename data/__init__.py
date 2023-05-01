@@ -103,4 +103,4 @@ def get_all_dataloader(
     
     return dataloader_dict
 
-__all__.extend([get_dataloader, get_data_list, get_all_dataloader])
+__all__.extend([get_dataloader, get_data_list, get_all_dataloader, train_transforms, test_transforms])
