@@ -14,7 +14,7 @@ class WallPaperDataset(Dataset):
         image = cv2.imread(img_path)
         
         if self.transforms is not None:
-            image = self.transforms(image=image)['image']
+            image = self.transforms(image)
         
         if self.label_list is not None:
             label = self.label_list[index]
