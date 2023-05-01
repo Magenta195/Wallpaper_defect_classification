@@ -99,7 +99,7 @@ class TRAINER() :
         self.val_loss = np.mean(val_loss_list)
 
     def _save_best_model( self ) :
-        if self.cur_score < self.best_score :
+        if self.cur_score > self.best_score :
             torch.save(self.model, self.MODEL_SAVE_PATH)
             print("detected new best model, model save....")
             self.cur_patience = 0
@@ -124,15 +124,15 @@ class TRAINER() :
             if self._early_stopping() :
                 break
 
-        if self.scheduler is not None :
-            self.scheduler.step()
+            if self.scheduler is not None :
+                self.scheduler.step()
 
-        print( " [ epoch : {:03d} ] train_loss : {:0.03f}, val_loss : {:0.03f}, val_score : {:0.03f}, max_val_score : {:0.03f} ".format(
-            i+1,
-            self.train_loss,
-            self.val_loss,
-            self.cur_score,
-            self.best_score))
+            print( " [ epoch : {:03d} ] train_loss : {:0.03f}, val_loss : {:0.03f}, val_score : {:0.03f}, max_val_score : {:0.03f} ".format(
+                i+1,
+                self.train_loss,
+                self.val_loss,
+                self.cur_score,
+                self.best_score))
 
 
     def make_predict( self ) :
