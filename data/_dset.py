@@ -1,5 +1,5 @@
 from PIL import Image
-
+from tqdm import tqdm
 from torch.utils.data import Dataset
 
 # class WallPaperDataset(Dataset):
@@ -30,7 +30,7 @@ class WallPaperDataset(Dataset):
         self.label_list = label_list
         self.transforms = transforms
         self.img_list = list()
-        for img_path in img_path_list :
+        for img_path in tqdm(img_path_list) :
             image = Image.open(img_path)
             if self.transforms is not None:
                 image = self.transforms(image)

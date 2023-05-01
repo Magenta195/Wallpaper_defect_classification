@@ -1,9 +1,9 @@
 import torch.nn as nn
 
-from ._effinet import BaseModel
+from ._effinet import _get_effinet_models
 
 model_dict = {
-    'effinet' : BaseModel,
+    'effinet' : _get_effinet_models,
 }
 
 def get_torch_model(

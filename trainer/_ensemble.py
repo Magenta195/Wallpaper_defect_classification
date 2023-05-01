@@ -52,7 +52,7 @@ class ENSEMBLE() : ### just using voting mechanism
 
         return preds
     
-    def make_predict(
+    def make_predict_file(
             self,
             mode : str = 'soft'
         ) -> None :
