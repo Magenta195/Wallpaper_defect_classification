@@ -3,10 +3,12 @@ from typing import Type
 import torch.nn as nn
 from sklearn.metrics import f1_score
 from .utils import CONFIG
+from .loss import FocalLoss
+
 
 loss_dict = {
     'celoss' : nn.CrossEntropyLoss,
-#    'focalloss' : ,
+   'focalloss' : FocalLoss,
 }
 
 score_dict = {
