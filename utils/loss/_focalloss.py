@@ -11,7 +11,7 @@ def label_to_one_hot_label(
     device: Optional[torch.device] = None,
     dtype: Optional[torch.dtype] = None,
     eps: float = 1e-6,
-    ignore_index=255,
+    ignore_index = 255,
 ) -> torch.Tensor:
     r"""
     Convert an integer label x-D tensor to a one-hot (x+1)-D tensor.
