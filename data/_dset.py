@@ -44,7 +44,7 @@ class WallPaperDataset(Dataset):
             label = self.label_list[index]
             return image, label
         else:
-            return image
+            return image, None
         
     def __len__(self):
         return len(self.img_list)

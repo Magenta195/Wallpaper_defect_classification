@@ -145,7 +145,7 @@ class TRAINER() :
         self.model.eval()
         preds = []
         with torch.no_grad():
-            for imgs in tqdm(self.testloader):
+            for imgs, _ in tqdm(self.testloader):
                 imgs = imgs.to(self.device)
                 
                 pred = self.softmax_for_predict(self.model(imgs))
