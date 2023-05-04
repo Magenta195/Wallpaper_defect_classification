@@ -20,7 +20,6 @@ def get_dataloader(
         cfg : Type[CONFIG],
         img_path_list : List[str],
         label_list : Optional[List[str]],
-        is_image_folder: False
     ) -> DataLoader :
     
     if mode not in mode_list :
