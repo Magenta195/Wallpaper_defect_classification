@@ -29,10 +29,12 @@ class ENSEMBLE() : ### just using voting mechanism
             ) for idx, _model in enumerate(model_list)
         ]
         
-    def train_all( self ) :
+
+    def train_all( self ) -> None :
         for idx, trainer in enumerate(self.trainer_list) :
             print('[Model {:03d} training start]'.format(idx + 1))
             trainer.full_train()
+
 
     def make_predict( 
             self,
@@ -52,6 +54,7 @@ class ENSEMBLE() : ### just using voting mechanism
 
         return preds
     
+
     def make_predict_file(
             self,
             mode : str = 'soft'

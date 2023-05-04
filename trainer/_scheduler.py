@@ -22,5 +22,4 @@ def _get_scheduler(
         print("Invaild Scheduler, Set scheduler as None...")
         return None
     
-    return scheduler_dict[cfg.SCHEDULER]( optimizer = optimizer,
-                                    **kwargs )
+    return scheduler_dict[cfg.SCHEDULER]( optimizer = optimizer, **kwargs )

@@ -54,7 +54,8 @@ class TRAINER() :
 
         self.model.to(self.device)
 
-    def _train_one_epoch( self ) :
+
+    def _train_one_epoch( self ) -> None :
         self.model.train()
         train_loss_list = []
         self.train_loss = 0
@@ -75,7 +76,8 @@ class TRAINER() :
 
         self.train_loss = np.mean(train_loss_list)
 
-    def _val_one_epoch( self ) :
+
+    def _val_one_epoch( self ) -> None :
         self.model.eval()
         val_loss_list = []
         preds, true_labels = [], []
@@ -98,7 +100,8 @@ class TRAINER() :
         self.cur_score = self.score_func(true_labels, preds, average = 'weighted')
         self.val_loss = np.mean(val_loss_list)
 
-    def _save_best_model( self ) :
+
+    def _save_best_model( self ) -> None :
         if self.cur_score > self.best_score :
             torch.save(self.model, self.MODEL_SAVE_PATH)
             print("detected new best model, model save....")
@@ -107,14 +110,15 @@ class TRAINER() :
         else :
             self.cur_patience += 1
 
-    def _early_stopping( self ) :
+
+    def _early_stopping( self ) -> bool :
         if self.cfg.PATIENCE == 0 :
             return False
         
         return self.cur_patience >= self.cfg.PATIENCE
         
 
-    def full_train( self ) :
+    def full_train( self ) -> None :
         self.train_loss_list = list()
         self.val_loss_list = list()
 
@@ -136,7 +140,7 @@ class TRAINER() :
                 self.best_score))
 
 
-    def make_predict( self ) :
+    def make_predict( self ) -> np.ndarray :
         self.model = torch.load(self.MODEL_SAVE_PATH)
         self.model.eval()
         preds = []
@@ -150,7 +154,8 @@ class TRAINER() :
         preds = np.concatenate(preds, axis = 0)
         return preds
 
-    def make_predict_file( self ) :
+
+    def make_predict_file( self ) -> None :
         preds = self.make_predict()
         preds = np.argmax(preds, axis = 1)
 

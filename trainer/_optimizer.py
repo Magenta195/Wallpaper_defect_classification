@@ -9,7 +9,8 @@ from .utils import CONFIG
 optimizer_dict = {
     'Adam' : torch.optim.Adam,
     'SGD' : torch.optim.SGD,
-    'Adamw' : torch.optim.AdamW
+    'Adamw' : torch.optim.AdamW,
+    'Adamax' : torch.optim.Adamax,
 }
 
 def _get_optimizer(
