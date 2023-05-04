@@ -65,7 +65,7 @@ def get_data_list(
         return img_list, label_list
 
     else :
-        TEST_DATA_PATH = os.path.join(cfg.DATA_PATH, 'test', '*')
+        TEST_DATA_PATH = os.path.join(cfg.DATA_PATH, 'test', '*', '*')
         img_list = glob.glob(TEST_DATA_PATH)
 
         return img_list, None
