@@ -9,7 +9,7 @@ from .utils import CONFIG
 scheduler_dict = {
     'exponential' : torch.optim.lr_scheduler.ExponentialLR,
     'multistep' : torch.optim.lr_scheduler.MultiStepLR,
-    'adamw' : torch.optim.lr_scheduler.CosineAnnealingLR
+    'cosine' : torch.optim.lr_scheduler.CosineAnnealingLR
 }
 
 def _get_scheduler(
@@ -22,4 +22,5 @@ def _get_scheduler(
         print("Invaild Scheduler, Set scheduler as None...")
         return None
     
-    return scheduler_dict[cfg.SCHEDULER]( optimizer = optimizer, **kwargs )
+    return scheduler_dict[cfg.SCHEDULER]( optimizer = optimizer,
+                                    **cfg.SCHEDULER_ARGS )

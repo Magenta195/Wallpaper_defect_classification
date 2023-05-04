@@ -24,4 +24,4 @@ def _get_optimizer(
     
     return optimizer_dict[cfg.OPTIMIZER]( params = model_param,
                                     lr = cfg.LEARNING_RATE,
-                                    **kwargs )
+                                    **cfg.OPTIMIZER_ARGS )

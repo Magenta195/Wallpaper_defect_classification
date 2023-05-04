@@ -1,6 +1,6 @@
 
 import os
-from typing import Dict, Optional
+from typing import Dict, Optional, Type
 
 class_name = [
     '가구수정', '걸레받이수정', '곰팡이', '꼬임', '녹오염', '들뜸', '면불량',
@@ -34,17 +34,20 @@ class CONFIG :
     PATIENCE = 4
 
     OPTIMIZER = 'Adam'
+    OPTIMIZER_ARGS = dict()
     LOSS = 'celoss'
+    LOSS_ARGS = dict()
     SCORE = 'f1score'
     SCHEDULER = None
+    SCHEDULER_ARGS = dict()
 
     ## ETC
     NUM_WORKER = 2
 
 
 def config_init(
-        cfg: Optional[Dict]
-    ) ->  CONFIG:
+        cfg: Optional[Dict[str, any]] = None,
+    ) ->  Type[CONFIG]:
     try :
         for key, val in cfg.items() :
             setattr(CONFIG, key, val)
@@ -53,3 +56,19 @@ def config_init(
         print("Set Default config setting")
 
     return CONFIG
+
+if __name__ == '__main__' :
+    cfg_dict = {
+        'OPTIMIZER' : 'Adam',
+        'OPTIMIZER_ARGS' : {
+            'eps' : 1e-07,
+            'weight_decay' : 0.1
+        },
+        'SCHEDULER' : 'cosine'
+    }
+    cfg = config_init(cfg_dict)
+    print(cfg.OPTIMIZER)
+    for key, val in cfg.OPTIMIZER_ARGS.items() :
+        print(key, val)
+    print(cfg.SCHEDULER)
+    print(cfg.IMG_SIZE)

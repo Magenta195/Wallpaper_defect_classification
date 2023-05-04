@@ -3,11 +3,11 @@ from typing import Type
 import torch.nn as nn
 from sklearn.metrics import f1_score
 from .utils import CONFIG
-from .loss import FocalLoss
+from .utils.loss import FocalLoss, CELoss
 
 
 loss_dict = {
-    'celoss' : nn.CrossEntropyLoss,
+    'celoss' : CELoss,
    'focalloss' : FocalLoss,
 }
 
@@ -23,7 +23,7 @@ def _get_loss_func(
     if cfg.LOSS not in loss_dict :
         raise NotImplementedError("Invaild Loss Fucntion")
     
-    return loss_dict[cfg.LOSS]( **kwargs )
+    return loss_dict[cfg.LOSS]( **cfg.LOSS_ARGS )
 
 
 def _get_score_func(

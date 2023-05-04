@@ -16,7 +16,6 @@ class ENSEMBLE() : ### just using voting mechanism
         device : torch.device,
         cfg : Type[CONFIG],
         best_model_name : str = 'best_model',
-        scheduler : Optional[str] = None, 
     ):
         self.cfg = cfg
         self.trainer_list = [
