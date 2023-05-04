@@ -27,10 +27,9 @@ class CONFIG :
     }
 
     ## config for hyperparameters
-    
     EPOCHS = 20
     LEARNING_RATE = 3e-4
-    BATCH_SIZE = 32
+    BATCH_SIZE = 8
     SEED = 41
     PATIENCE = 4
 
@@ -40,7 +39,6 @@ class CONFIG :
     SCHEDULER = None
 
     ## ETC
-
     NUM_WORKER = 2
 
 
