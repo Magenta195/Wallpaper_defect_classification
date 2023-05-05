@@ -10,7 +10,7 @@ import torch.nn as nn
 import torch
 from torch.utils.data import DataLoader
 
-from .utils import CONFIG
+from utils import CONFIG
 from ._optimizer import _get_optimizer
 from ._scheduler import _get_scheduler
 from ._metric import _get_loss_func, _get_score_func
@@ -91,13 +91,13 @@ class TRAINER() :
                 pred = self.model(imgs)
                 
                 loss = self.criterion(pred, labels)
-                
-                preds += pred.argmax(1).detach().cpu().numpy().tolist()
-                true_labels += labels.detach().cpu().numpy().tolist()
+
+                preds.append(pred.argmax(1).data)                
+                true_labels.append(labels.data)
                 
                 val_loss_list.append(loss.item())
         
-        self.cur_score = self.score_func(true_labels, preds, average = 'weighted')
+        self.cur_score = self.score_func(true_labels, preds, device=self.device, cfg=self.cfg, average = 'weighted')
         self.val_loss = np.mean(val_loss_list)
 
 

@@ -1,4 +1,3 @@
-
 import os
 from typing import Dict, Optional, Type
 
@@ -21,6 +20,7 @@ class CONFIG :
         class_name[idx] : idx 
         for idx in range(len(class_name))
     }
+    NUM_CLASSES = len(CLASS_DICT)
     INV_CLASS_DICT = {
         val : key
         for key, val in CLASS_DICT.items()

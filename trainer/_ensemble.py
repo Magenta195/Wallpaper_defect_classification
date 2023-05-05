@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch
 from torch.utils.data import DataLoader
 
-from .utils import CONFIG
+from utils import CONFIG
 from ._trainer import TRAINER
 
 class ENSEMBLE() : ### just using voting mechanism

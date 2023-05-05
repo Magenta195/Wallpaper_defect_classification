@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split, StratifiedKFold
 from torch.utils.data import DataLoader, random_split, Subset
 
 
-from .utils import CONFIG
+from utils import CONFIG
 from ._dset import *
 from ._argumentation import *
 from ._dutils import *
