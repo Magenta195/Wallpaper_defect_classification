@@ -3,7 +3,7 @@ import glob
 import os 
 import unicodedata
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold
 from torch.utils.data import DataLoader, random_split
 from torchvision.datasets import ImageFolder
 
@@ -18,8 +18,9 @@ mode_list = ['train', 'val', 'test']
 def get_dataloader(
         mode : str,
         cfg : Type[CONFIG],
-        img_path_list : List[str],
-        label_list : Optional[List[str]],
+        img_path_list : Optional[List[str]] = None,
+        label_list : Optional[List[str]] = None,
+        dataset : Optional[Dataset] = None,
     ) -> DataLoader :
     
     if mode not in mode_list :
@@ -32,11 +33,12 @@ def get_dataloader(
         transform = test_transforms( cfg = cfg )
         shuffle = False
 
-    dataset = WallPaperDataset(
-        img_path_list = img_path_list,
-        label_list = label_list,
-        transforms = transform
-    )
+    if dataset is None :
+        dataset = WallPaperDataset(
+            img_path_list = img_path_list,
+            label_list = label_list,
+            transforms = transform
+        )
 
     return DataLoader(
         dataset = dataset,
@@ -97,45 +99,88 @@ def get_all_dataloader(
         for mode in ['train', 'test'] :
             img_folder = get_image_folder(mode, cfg)
             if mode == 'train' :
-                train_folder, val_folder = random_split(img_folder, [0.9, 0.1])
+                train_folder, val_folder = random_split(img_folder, [1-val_size, val_size])
                 datalist_dict['train'] = train_folder
                 datalist_dict['val'] = val_folder
             else:
                 datalist_dict['test'] = img_folder
             
-        for mode in mode_list:
-            img_folder = datalist_dict[mode]
-            dataloader_dict[mode] = DataLoader(
-                                        dataset = img_folder,
-                                        batch_size = cfg.BATCH_SIZE,
-                                        shuffle = True if mode in ['train', 'val'] else False,
-                                        num_workers = cfg.NUM_WORKER
-                                    )
     else:
         for mode in ['train', 'test'] :
             img_list, label_list = get_data_list( mode = mode, cfg = cfg )
-
             if mode == 'train' :
                 train_img_list, val_img_list, train_label_list, val_label_list = train_test_split(
                     img_list, label_list, 
                     test_size = val_size,
-                    train_size = 1 - val_size,
                 )
-
                 datalist_dict['train'] = [train_img_list, train_label_list]
                 datalist_dict['val'] = [val_img_list, val_label_list]
-
             else :
                 datalist_dict[mode] = [img_list, label_list]
 
-        for mode in mode_list :
+    for mode in mode_list :
+        if image_folder :
+            img_list, label_list = None, None
+            img_folder = datalist_dict[mode]
+        else :
             img_list, label_list = datalist_dict[mode]
-            dataloader_dict[mode] = get_dataloader(
-                        mode = mode,
-                        cfg = cfg,
-                        img_path_list = img_list,
-                        label_list = label_list)
+            img_folder = None
+        dataloader_dict[mode] = get_dataloader(
+                    mode = mode,
+                    cfg = cfg,
+                    img_path_list = img_list,
+                    label_list = label_list,
+                    dataset = img_folder
+                )
     
     return dataloader_dict
 
-__all__.extend([get_dataloader, get_data_list, get_all_dataloader, train_transforms, test_transforms])
+def get_kfold_dataloader(
+        cfg : Type[CONFIG],
+    ) -> Dict[str, DataLoader] :
+
+    dataloader_dict = dict()
+    datalist_dict = dict()
+
+    kfold = StratifiedKFold(n_splits = cfg.KFOLD)
+    # Only use torchvision.datasets.ImageFolder
+  
+    for mode in ['train', 'test'] :
+        img_folder = get_image_folder(mode, cfg)
+        if mode == 'train' :
+            label_list =  [ x for _, x in img_folder.samples ]
+            for i, (train_dset, val_dset) in enumerate(kfold.split(img_folder, label_list)) :
+                val_dset.transform = test_transforms( cfg = cfg )
+                datalist_dict[str(i)] =  ( train_dset, val_dset )
+        else:
+            datalist_dict['test'] = ( img_folder, None )
+ 
+    for mode, (dset1, dset2) in datalist_dict.items() :
+        if mode == 'test' :
+            dataloader_dict[mode] = get_dataloader(
+                        mode = 'test',
+                        cfg = cfg,
+                        img_path_list = None,
+                        label_list = None,
+                        dataset = dset1
+                    )
+        else :
+            dataloader_dict['train' + mode] = get_dataloader(
+                        mode = 'train',
+                        cfg = cfg,
+                        img_path_list = None,
+                        label_list = None,
+                        dataset = dset1
+                    )
+            dataloader_dict['val' + mode] = get_dataloader(
+                        mode = 'val',
+                        cfg = cfg,
+                        img_path_list = None,
+                        label_list = None,
+                        dataset = dset2
+                    )
+                            
+    return dataloader_dict
+
+
+__all__.extend([get_dataloader, get_data_list, get_all_dataloader, get_kfold_dataloader, train_transforms, test_transforms])

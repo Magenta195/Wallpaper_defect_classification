@@ -27,6 +27,7 @@ class CONFIG :
     }
 
     ## config for hyperparameters
+    KFOLD = 5
     EPOCHS = 20
     LEARNING_RATE = 3e-4
     BATCH_SIZE = 8

@@ -4,30 +4,39 @@ import pandas as pd
 import numpy as np
 import torch.nn as nn
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 
 from .utils import CONFIG
 from ._trainer import TRAINER
 
-class ENSEMBLE() : ### just using voting mechanism
+class ENSEMBLE_BAGGING() : ### bagging
     def __init__( self, 
-        model_list : List[nn.Module],
+        model : nn.Module,
         dataloaders : Dict[DataLoader],
         device : torch.device,
         cfg : Type[CONFIG],
         best_model_name : str = 'best_model',
+        weighted_sample : bool = False, # Not implemented
     ):
         self.cfg = cfg
-        self.trainer_list = [
+        self.trainer_list = list()
+
+        for idx in range(cfg.KFOLD) :
+            _dataloaders = {
+                'train' : dataloaders['train' + str(idx)],
+                'val' : dataloaders['val' + str(idx)],
+                'test' : dataloaders['test']
+            }
+            self.trainer_list.append(
                 TRAINER(
-                    model = _model,
-                    dataloaders = dataloaders,
+                    model = model,
+                    dataloaders = _dataloaders,
                     device = device,
                     cfg = cfg,
                     best_model_name = best_model_name + str(idx),
-            ) for idx, _model in enumerate(model_list)
-        ]
-        
+                )   
+            )
+
     def train_all( self ) -> None :
         for idx, trainer in enumerate(self.trainer_list) :
             print('[Model {:03d} training start]'.format(idx + 1))
@@ -47,7 +56,7 @@ class ENSEMBLE() : ### just using voting mechanism
                 preds = result
             else :
                 preds += result
-
+                
         return preds
     
     def make_predict_file(
@@ -57,7 +66,6 @@ class ENSEMBLE() : ### just using voting mechanism
 
         preds = self.make_predict( mode )
         preds = np.argmax(preds, axis = 1)
-
         preds = [ self.cfg.INV_CLASS_DICT[pred] for pred in preds ]
 
         submit_df = pd.read_csv( self.cfg.SUBMIT_PATH )
