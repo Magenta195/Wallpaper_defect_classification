@@ -28,10 +28,17 @@ if __name__ == "__main__":
     import torch.nn as nn
 
 
+    # device setting
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print('cur device: ', device)
 
+    # config setting
+    config_init({'NUM_CLASSES': 3})
+    cfg = CONFIG
+    print('cfg num_classes: ', cfg.NUM_CLASSES)
+
+    # make test preds, labels
     preds, labels = [], []
-
     m = nn.Linear(20, 3)
     m.to(device)
     for _ in range(2):
@@ -44,5 +51,9 @@ if __name__ == "__main__":
         output = output.argmax(1)
         preds.append(output.data)
 
-    config_init({'NUM_CLASSES': 3})
-    print(f1_score(labels, preds, device, cfg={'NUM_CLASSES': 3}))
+    s = f1_score(labels, preds, device, cfg=cfg)
+
+    # print result
+    print(s)
+    print(type(s))
+    print(s.device)
