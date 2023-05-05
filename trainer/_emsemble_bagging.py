@@ -12,7 +12,7 @@ from ._trainer import TRAINER
 class ENSEMBLE_BAGGING() : ### bagging
     def __init__( self, 
         model : nn.Module,
-        dataloaders : Dict[DataLoader],
+        dataloaders : Dict[str, DataLoader],
         device : torch.device,
         cfg : Type[CONFIG],
         best_model_name : str = 'best_model',
@@ -56,7 +56,7 @@ class ENSEMBLE_BAGGING() : ### bagging
                 preds = result
             else :
                 preds += result
-                
+
         return preds
     
     def make_predict_file(

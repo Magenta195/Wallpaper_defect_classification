@@ -12,7 +12,7 @@ from ._trainer import TRAINER
 class ENSEMBLE() : ### just using voting mechanism
     def __init__( self, 
         model_list : List[nn.Module],
-        dataloaders : Dict[DataLoader],
+        dataloaders : Dict[str, DataLoader],
         device : torch.device,
         cfg : Type[CONFIG],
         best_model_name : str = 'best_model',
