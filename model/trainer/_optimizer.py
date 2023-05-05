@@ -4,7 +4,7 @@ from typing import Type
 import torch.nn as nn
 import torch.optim
 
-from .utils import CONFIG
+from utils import CONFIG
 
 optimizer_dict = {
     'Adam' : torch.optim.Adam,

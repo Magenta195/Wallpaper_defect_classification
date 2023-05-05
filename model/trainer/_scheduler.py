@@ -4,7 +4,7 @@ from typing import Union, Type
 import torch.nn as nn
 import torch.optim
 
-from .utils import CONFIG
+from utils import CONFIG
 
 scheduler_dict = {
     'exponential' : torch.optim.lr_scheduler.ExponentialLR,

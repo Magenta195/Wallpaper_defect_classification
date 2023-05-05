@@ -3,7 +3,7 @@ from typing import Type, List
 import torch
 from torchmetrics.classification import MulticlassF1Score
 
-from .utils import CONFIG, config_init
+from utils import CONFIG, config_init
 
 
 def f1_score(
@@ -43,6 +43,6 @@ if __name__ == "__main__":
         output = m(input)
         output = output.argmax(1)
         preds.append(output.data)
-        
+
     config_init({'NUM_CLASSES': 3})
     print(f1_score(labels, preds, device, cfg={'NUM_CLASSES': 3}))

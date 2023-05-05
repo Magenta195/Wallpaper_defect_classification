@@ -3,7 +3,7 @@ from typing import Type
 
 import torch.nn as nn
 from torchvision import transforms
-from .utils import CONFIG
+from utils import CONFIG
     
 
 def train_transforms(
