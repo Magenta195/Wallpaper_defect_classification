@@ -133,7 +133,7 @@ class TRAINER() :
                 self.scheduler.step()
 
             print( " [ epoch : {:03d} ] train_loss : {:0.03f}, val_loss : {:0.03f}, val_score : {:0.03f}, max_val_score : {:0.03f} ".format(
-                i+1,
+                i,
                 self.train_loss,
                 self.val_loss,
                 self.cur_score,
