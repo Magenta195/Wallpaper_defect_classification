@@ -6,7 +6,7 @@ import os
 from torch.utils.data import DataLoader, random_split, Subset, Dataset
 from torchvision.datasets import ImageFolder
 
-from .utils import CONFIG
+from utils import CONFIG
 from ._argumentation import *
 from ._dset import *
 

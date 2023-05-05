@@ -9,9 +9,9 @@ from torch.utils.data import DataLoader, Dataset
 from utils import CONFIG
 from ._trainer import TRAINER
 
-class ENSEMBLE_BAGGING() : ### bagging
+class ENSEMBLE_BOOSTING() : ### boosting. Not completely implemented
     def __init__( self, 
-        model_list : List[nn.Module],
+        model : nn.Module,
         dataloaders : Dict[str, DataLoader],
         device : torch.device,
         cfg : Type[CONFIG],
@@ -29,7 +29,7 @@ class ENSEMBLE_BAGGING() : ### bagging
             }
             self.trainer_list.append(
                 TRAINER(
-                    model = model_list[idx],
+                    model = model,
                     dataloaders = _dataloaders,
                     device = device,
                     cfg = cfg,
