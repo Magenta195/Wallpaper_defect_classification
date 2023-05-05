@@ -4,7 +4,7 @@ import os
 import unicodedata
 
 from sklearn.model_selection import train_test_split, StratifiedKFold
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, random_split, Subset
 from torchvision.datasets import ImageFolder
 
 from .utils import CONFIG
@@ -149,7 +149,9 @@ def get_kfold_dataloader(
         img_folder = get_image_folder(mode, cfg)
         if mode == 'train' :
             label_list =  [ x for _, x in img_folder.samples ]
-            for i, (train_dset, val_dset) in enumerate(kfold.split(img_folder, label_list)) :
+            for i, (train_idx, val_idx) in enumerate(kfold.split(img_folder, label_list)) :
+                train_dset = Subset(img_folder, train_idx)
+                val_dset = Subset(img_folder, val_idx)
                 val_dset.transform = test_transforms( cfg = cfg )
                 datalist_dict[str(i)] =  ( train_dset, val_dset )
         else:
