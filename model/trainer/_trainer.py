@@ -91,9 +91,9 @@ class TRAINER() :
                 pred = self.model(imgs)
                 
                 loss = self.criterion(pred, labels)
-                
-                preds += pred.argmax(1).detach().cpu().numpy().tolist()
-                true_labels += labels.detach().cpu().numpy().tolist()
+
+                preds.append(pred.argmax(1).data)                
+                true_labels.append(labels.data)
                 
                 val_loss_list.append(loss.item())
         

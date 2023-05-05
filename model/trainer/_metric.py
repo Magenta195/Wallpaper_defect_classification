@@ -1,10 +1,9 @@
 from typing import Type
 
 import torch.nn as nn
-from sklearn.metrics import f1_score
 from utils import CONFIG
 from .loss import FocalLoss, CELoss
-
+from .score import f1_score
 
 loss_dict = {
     'celoss' : CELoss,

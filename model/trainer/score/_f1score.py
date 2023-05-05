@@ -56,4 +56,3 @@ if __name__ == "__main__":
     # print result
     print(s)
     print(type(s))
-    print(s.device)
