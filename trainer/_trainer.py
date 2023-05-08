@@ -60,7 +60,7 @@ class TRAINER() :
         train_loss_list = []
         self.train_loss = 0
 
-        for imgs, labels in tqdm(self.trainloader):
+        for idx, (imgs, labels) in tqdm(enumerate(self.trainloader)):
             imgs = imgs.to(self.device)
             labels = labels.to(self.device)
             
@@ -71,6 +71,8 @@ class TRAINER() :
             
             loss.backward()
             self.optimizer.step()
+            if self.cfg.SCHEDULER == 'cosinewarmup' :
+                self.scheduler.step(self.cur_epoch + idx / len(self.trainloader))
             
             train_loss_list.append(loss.item())
 
@@ -122,15 +124,16 @@ class TRAINER() :
         self.train_loss_list = list()
         self.val_loss_list = list()
 
-        for i in range( 1, self.cfg.EPOCHS+1 ) :
+        for i in range( self.cfg.EPOCHS ) :
+            self.cur_epoch = i
             self._train_one_epoch()
             self._val_one_epoch()
             self._save_best_model()
-            if self.scheduler is not None :
+            if self.scheduler is not None and self.cfg.SCHEDULER != 'cosinewarmup':
                 self.scheduler.step()
 
             print( " [ epoch : {:03d} ] train_loss : {:0.03f}, val_loss : {:0.03f}, val_score : {:0.03f}, max_val_score : {:0.03f} ".format(
-                i,
+                i+1,
                 self.train_loss,
                 self.val_loss,
                 self.cur_score,

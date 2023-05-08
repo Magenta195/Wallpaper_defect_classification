@@ -27,6 +27,7 @@ class CONFIG :
     }
 
     ## config for hyperparameters
+    SEED = 1024
     KFOLD = 5
     EPOCHS = 20
     LEARNING_RATE = 3e-4

@@ -25,7 +25,7 @@ def get_all_dataloader(
         for mode in ['train', 'test'] :
             img_folder = get_image_folder(mode, cfg)
             if mode == 'train' :
-                train_folder, val_folder = random_split(img_folder, [1-val_size, val_size])
+                train_folder, val_folder = random_split(img_folder, [1-val_size, val_size], random_split = cfg.SEED)
                 datalist_dict['train'] = train_folder
                 datalist_dict['val'] = val_folder
             else:
@@ -67,7 +67,7 @@ def get_kfold_dataloader(
 
     dataloader_dict = dict()
     datalist_dict = dict()
-    kfold = StratifiedKFold(n_splits = cfg.KFOLD)
+    kfold = StratifiedKFold(n_splits = cfg.KFOLD, random_state = cfg.SEED)
     # Only use torchvision.datasets.ImageFolder
   
     for mode in ['train', 'test'] :

@@ -9,7 +9,8 @@ from utils import CONFIG
 scheduler_dict = {
     'exponential' : torch.optim.lr_scheduler.ExponentialLR,
     'multistep' : torch.optim.lr_scheduler.MultiStepLR,
-    'cosine' : torch.optim.lr_scheduler.CosineAnnealingLR
+    'cosine' : torch.optim.lr_scheduler.CosineAnnealingLR,
+    'cosinewarmup' : torch.optim.lr_scheduler.CosineAnnealingWarmRestarts
 }
 
 def _get_scheduler(
