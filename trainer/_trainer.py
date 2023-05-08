@@ -60,7 +60,7 @@ class TRAINER() :
         train_loss_list = []
         self.train_loss = 0
 
-        for idx, (imgs, labels) in tqdm(enumerate(self.trainloader)):
+        for idx, (imgs, labels) in enumerate(tqdm(self.trainloader)):
             imgs = imgs.to(self.device)
             labels = labels.to(self.device)
             
