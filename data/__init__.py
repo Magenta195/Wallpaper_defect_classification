@@ -25,7 +25,7 @@ def get_all_dataloader(
         for mode in ['train', 'test'] :
             img_folder = get_image_folder(mode, cfg)
             if mode == 'train' :
-                train_folder, val_folder = random_split(img_folder, [1-val_size, val_size], random_state = cfg.SEED)
+                train_folder, val_folder = random_split(img_folder, [1-val_size, val_size])
                 datalist_dict['train'] = train_folder
                 datalist_dict['val'] = val_folder
             else:
@@ -38,6 +38,7 @@ def get_all_dataloader(
                 train_img_list, val_img_list, train_label_list, val_label_list = train_test_split(
                     img_list, label_list, 
                     test_size = val_size,
+                    random_state = cfg.SEED
                 )
                 datalist_dict['train'] = [train_img_list, train_label_list]
                 datalist_dict['val'] = [val_img_list, val_label_list]
