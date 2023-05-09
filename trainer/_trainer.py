@@ -49,8 +49,12 @@ class TRAINER() :
         self.cur_patience = 0
         self.softmax_for_predict = nn.Softmax()
 
-        self.cur_score = -float('inf')
-        self.best_score = -float('inf')
+        self.val_loss = float('inf')
+        self.val_score = -float('inf')
+        if cfg.METRIC_SCOPE == 'score' :
+            self.best_score = self.val_score
+        else :
+            self.best_score = self.val_loss
 
         self.model.to(self.device)
 
@@ -99,15 +103,26 @@ class TRAINER() :
                 
                 val_loss_list.append(loss.item())
         
-        self.cur_score = self.score_func(true_labels, preds, device=self.device, cfg=self.cfg, average = 'weighted')
+        self.val_score = self.score_func(true_labels, preds, device=self.device, cfg=self.cfg, average = 'weighted')
         self.val_loss = np.mean(val_loss_list)
 
+    def _is_best_model( self ) -> bool :
+        if self.cfg.METRIC_SCOPE == 'score' :
+            return self.val_score > self.best_score
+        else :
+            return self.val_loss < self.best_score
+    
+    def _cur_metric( self ) -> float :
+        if self.cfg.METRIC_SCOPE == 'score' :
+            return self.val_score
+        else :
+            return self.val_loss
 
     def _save_best_model( self ) -> None :
-        if self.cur_score > self.best_score :
+        if self._is_best_model() :
             torch.save(self.model, self.MODEL_SAVE_PATH)
             print("detected new best model, model save....")
-            self.best_score = self.cur_score
+            self.best_score = self._cur_metric()
             self.cur_patience = 0
         else :
             self.cur_patience += 1
@@ -136,7 +151,7 @@ class TRAINER() :
                 i+1,
                 self.train_loss,
                 self.val_loss,
-                self.cur_score,
+                self.val_score,
                 self.best_score))
             if self._early_stopping() :
                 break

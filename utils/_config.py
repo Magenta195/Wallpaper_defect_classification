@@ -42,6 +42,7 @@ class CONFIG :
     SCORE = 'f1score'
     SCHEDULER = None
     SCHEDULER_ARGS = dict()
+    METRIC_SCOPE = 'score'
 
     ## ETC
     NUM_WORKER = 2
