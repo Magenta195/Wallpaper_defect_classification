@@ -211,4 +211,4 @@ class FocalLoss(nn.Module):
         self.ignore_index = ignore_index
 
     def forward(self, input, target):
-        return focal_loss(input, target, self.alpha, self.gamma, self.reduction, self.eps, self.ignore_index)
+        return focal_loss(input, target, self.label_smooth, self.smooth_alpha, self.alpha, self.gamma, self.reduction, self.eps, self.ignore_index)
