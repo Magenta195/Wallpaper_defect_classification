@@ -16,6 +16,7 @@ class CONFIG :
 
     ## config for data argumentation
     IMG_SIZE = 224
+    CLASS_NUM = len(class_name)
     CLASS_DICT = {
         class_name[idx] : idx 
         for idx in range(len(class_name))
@@ -35,6 +36,7 @@ class CONFIG :
     SEED = 41
     PATIENCE = 4
 
+    ## config for model learning setting
     OPTIMIZER = 'Adam'
     OPTIMIZER_ARGS = dict()
     LOSS = 'celoss'

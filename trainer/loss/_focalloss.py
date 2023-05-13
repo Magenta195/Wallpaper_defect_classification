@@ -58,7 +58,7 @@ def label_to_one_hot_label(
 
 
 # https://github.com/zhezh/focalloss/blob/master/focalloss.py
-def focal_loss(input, target, alpha, gamma, reduction, eps, ignore_index):
+def focal_loss(input, target, label_smooth, smooth_alpha, alpha, gamma, reduction, eps, ignore_index):
     r"""
     Criterion that computes Focal loss.
 
@@ -134,6 +134,9 @@ def focal_loss(input, target, alpha, gamma, reduction, eps, ignore_index):
     # create the labels one hot tensor
     # target_one_hot : (B, C, H, W)
     target_one_hot = label_to_one_hot_label(target.long(), num_classes=input.shape[1], device=input.device, dtype=input.dtype, ignore_index=ignore_index)
+    if label_smooth :
+        target_one_hot = target_one_hot * ( 1 - smooth_alpha ) + smooth_alpha / input.shape[1]
+
 
     # compute the actual focal loss
     weight = torch.pow(1.0 - input_soft, gamma)
@@ -197,8 +200,10 @@ class FocalLoss(nn.Module):
         >>> output.backward()
     """
 
-    def __init__(self, alpha=0.5, gamma = 2.0, reduction = 'mean', eps = 1e-8, ignore_index=30):
+    def __init__(self, label_smooth = False, smooth_alpha = 0.02, alpha=0.5, gamma = 2.0, reduction = 'mean', eps = 1e-8, ignore_index=30):
         super().__init__()
+        self.label_smooth = label_smooth
+        self.smooth_alpha = smooth_alpha
         self.alpha = alpha
         self.gamma = gamma
         self.reduction = reduction
