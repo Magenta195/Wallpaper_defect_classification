@@ -117,13 +117,13 @@ parser.add_option("-p", "--path", type="string",
                 help="Root path having some directories to augmentate")
 parser.add_option("-n", "--numfiles", type="int",
                 help="select directories the number of each less than the value")
-parser.add_option("-a", "--all", default=False,
+parser.add_option("-a", "--all", default=False, action="store_true",
                 help="apply all augmentation (crop & noise)")
 
 # crop options
 crop_option = OptionGroup(parser, "Random Crop Options",
                           "use these option at random crop function")
-crop_option.add_option("-c", "--crop", default=True, action="store_false",
+crop_option.add_option("-c", "--crop", default=False, action="store_true",
                 help="replicates the random crop process")
 crop_option.add_option("-r", "--crop_rate", default=0.7, 
                 help="crop size: input image width * 0.7, height * 0.7")
@@ -132,7 +132,7 @@ parser.add_option_group(crop_option)
 # noise options
 noise_option = OptionGroup(parser, "Noise Options",
                            "use these option at noise function")
-noise_option.add_option("-g", "--noise", default=True, action="store_false",
+noise_option.add_option("-g", "--noise", default=False, action="store_true",
                     help="replicates the image noising process")
 noise_option.add_option("-i", "--noise_intensity", default=0.2,
                     help="use setting noise threshold: 1 - intensity")
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     # random_crop(['/home/mooooongni/사진/증명사진.jpg'])
     # noise_image(['/home/mooooongni/사진/증명사진.jpg'])
     (options, args) = parser.parse_args()
-
+    print(options)
     path_list = select_dir(options.path, options.numfiles)    
     if options.all:
         random_crop(path_list, options.crop_rate)
