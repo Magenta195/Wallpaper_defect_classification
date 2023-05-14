@@ -3,7 +3,7 @@ import unicodedata
 import glob
 import os 
 
-from torch.utils.data import DataLoader, random_split, Subset, Dataset
+from torch.utils.data import DataLoader, random_split, Subset, Dataset, Sampler
 from torchvision.datasets import ImageFolder
 
 from utils import CONFIG
@@ -18,7 +18,7 @@ def get_dataloader(
         img_path_list : Optional[List[str]] = None,
         label_list : Optional[List[str]] = None,
         dataset : Optional[Dataset] = None,
-        **kwargs
+        sampler : Optional[Sampler] = None
     ) -> DataLoader :
     
     if mode not in mode_list :
@@ -41,7 +41,7 @@ def get_dataloader(
         batch_size = cfg.BATCH_SIZE,
         shuffle = False,
         num_workers = cfg.NUM_WORKER,
-        **kwargs
+        sampler = sampler
     )
 
 def get_data_list(
