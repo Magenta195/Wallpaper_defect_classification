@@ -117,7 +117,10 @@ parser.add_option("-p", "--path", type="string",
                 help="Root path having some directories to augmentate")
 parser.add_option("-n", "--numfiles", type="int",
                 help="select directories the number of each less than the value")
+parser.add_option("-a", "--all", default=False,
+                help="apply all augmentation (crop & noise)")
 
+# crop options
 crop_option = OptionGroup(parser, "Random Crop Options",
                           "use these option at random crop function")
 crop_option.add_option("-c", "--crop", default=True, action="store_false",
@@ -126,6 +129,7 @@ crop_option.add_option("-r", "--crop_rate", default=0.7,
                 help="crop size: input image width * 0.7, height * 0.7")
 parser.add_option_group(crop_option)
 
+# noise options
 noise_option = OptionGroup(parser, "Noise Options",
                            "use these option at noise function")
 noise_option.add_option("-g", "--noise", default=True, action="store_false",
@@ -141,8 +145,11 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     path_list = select_dir(options.path, options.numfiles)    
-    
-    if options.crop:
+    if options.all:
         random_crop(path_list, options.crop_rate)
-    if options.noise:
         noise_image(path_list, options.noise_intensity)
+    else:
+        if options.crop:
+            random_crop(path_list, options.crop_rate)
+        if options.noise:
+            noise_image(path_list, options.noise_intensity)

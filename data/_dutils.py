@@ -18,6 +18,7 @@ def get_dataloader(
         img_path_list : Optional[List[str]] = None,
         label_list : Optional[List[str]] = None,
         dataset : Optional[Dataset] = None,
+        **kwargs
     ) -> DataLoader :
     
     if mode not in mode_list :
@@ -25,10 +26,8 @@ def get_dataloader(
     
     if mode == 'train' :
         transform = train_transforms( cfg = cfg )
-        shuffle = True
     else :
         transform = test_transforms( cfg = cfg )
-        shuffle = False
 
     if dataset is None :
         dataset = WallPaperDataset(
@@ -40,8 +39,9 @@ def get_dataloader(
     return DataLoader(
         dataset = dataset,
         batch_size = cfg.BATCH_SIZE,
-        shuffle = shuffle,
+        shuffle = False,
         num_workers = cfg.NUM_WORKER
+        **kwargs
     )
 
 def get_data_list(
