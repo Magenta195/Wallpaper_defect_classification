@@ -40,7 +40,7 @@ def get_dataloader(
         dataset = dataset,
         batch_size = cfg.BATCH_SIZE,
         shuffle = False,
-        num_workers = cfg.NUM_WORKER
+        num_workers = cfg.NUM_WORKER,
         **kwargs
     )
 
