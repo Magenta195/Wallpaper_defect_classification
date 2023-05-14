@@ -65,7 +65,7 @@ def get_all_dataloader(
         dataloader_dict[mode] = get_dataloader(
             mode = mode,
             cfg = cfg,
-            img__path_list = img_list,
+            img_path_list = img_list,
             label_list = label_list,
             dataset = img_folder,
             sampler = sampler_dict[mode]
