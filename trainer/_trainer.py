@@ -50,8 +50,12 @@ class TRAINER() :
         self.cur_patience = 0
         self.softmax_for_predict = nn.Softmax()
 
-        self.cur_score = -float('inf')
-        self.best_score = -float('inf')
+        self.val_loss = float('inf')
+        self.val_score = -float('inf')
+        if cfg.METRIC_SCOPE == 'score' :
+            self.best_score = self.val_score
+        else :
+            self.best_score = self.val_loss
 
         self.model.to(self.device)
 
@@ -59,6 +63,7 @@ class TRAINER() :
     def _train_one_epoch( self ) -> None :
         self.model.train()
         train_loss_list = []
+        preds, true_labels = [], []
         self.train_loss = 0
 
         for idx, (imgs, labels) in enumerate(tqdm(self.trainloader)):
@@ -87,7 +92,10 @@ class TRAINER() :
             
             # output = self.model(imgs)
             # loss = self.criterion(output, labels)
-            
+
+            preds.append(outputs.argmax(1).data)                
+            true_labels.append(labels.data)
+
             loss.backward()
             self.optimizer.step()
             if self.cfg.SCHEDULER == 'cosinewarmup' :
@@ -95,6 +103,7 @@ class TRAINER() :
             
             train_loss_list.append(loss.item())
 
+        self.train_score = self.score_func(true_labels, preds, device=self.device, cfg=self.cfg, average = 'weighted')
         self.train_loss = np.mean(train_loss_list)
 
 
@@ -121,12 +130,23 @@ class TRAINER() :
         self.cur_score = self.score_func(true_labels, preds, device=self.device, cfg=self.cfg, average = 'weighted')
         self.val_loss = np.mean(val_loss_list)
 
+    def _is_best_model( self ) -> bool :
+        if self.cfg.METRIC_SCOPE == 'score' :
+            return self.val_score > self.best_score
+        else :
+            return self.val_loss < self.best_score
+    
+    def _cur_metric( self ) -> float :
+        if self.cfg.METRIC_SCOPE == 'score' :
+            return self.val_score
+        else :
+            return self.val_loss
 
     def _save_best_model( self ) -> None :
-        if self.cur_score > self.best_score :
+        if self._is_best_model() :
             torch.save(self.model, self.MODEL_SAVE_PATH)
             print("detected new best model, model save....")
-            self.best_score = self.cur_score
+            self.best_score = self._cur_metric()
             self.cur_patience = 0
         else :
             self.cur_patience += 1
@@ -151,11 +171,12 @@ class TRAINER() :
             if self.scheduler is not None and self.cfg.SCHEDULER != 'cosinewarmup':
                 self.scheduler.step()
 
-            print( " [ epoch : {:03d} ] train_loss : {:0.03f}, val_loss : {:0.03f}, val_score : {:0.03f}, max_val_score : {:0.03f} ".format(
+            print( " [ epoch : {:03d} ]  train_loss : {:0.03f}, train_score : {:0.03f}, val_loss : {:0.03f}, val_score : {:0.03f}, max_val_score : {:0.03f} ".format(
                 i+1,
                 self.train_loss,
+                self.train_score,
                 self.val_loss,
-                self.cur_score,
+                self.val_score,
                 self.best_score))
             if self._early_stopping() :
                 break
