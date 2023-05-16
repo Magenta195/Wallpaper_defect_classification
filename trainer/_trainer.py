@@ -171,7 +171,7 @@ class TRAINER() :
             if self.scheduler is not None and self.cfg.SCHEDULER != 'cosinewarmup':
                 self.scheduler.step()
 
-            print( " [ epoch : {:03d} ]  train_loss : {:0.03f}, val_loss : {:0.03f}, val_score : {:0.03f}, max_val_score : {:0.03f} ".format(
+            print( " [ epoch : {:03d} ]  train_loss : {:0.03f}, train_score : {:0.03f}, val_loss : {:0.03f}, val_score : {:0.03f}, max_val_score : {:0.03f} ".format(
                 i+1,
                 self.train_loss,
                 self.train_score,
