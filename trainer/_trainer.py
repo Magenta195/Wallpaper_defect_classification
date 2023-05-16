@@ -1,6 +1,6 @@
 
 import os
-from typing import Optional, Type
+from typing import Optional, Type, Tuple
 from tqdm import tqdm
 
 import numpy as np
@@ -58,6 +58,20 @@ class TRAINER() :
 
         self.model.to(self.device)
 
+
+    def mixup_data(self, x, y, alpha=1.0) -> Tuple[torch.Tensor, int, int, float]:
+        """Returns mixed inputs, pairs of targets, and lambda"""
+        if alpha > 0:
+            lam = np.random.beta(alpha, alpha)
+        else:
+            lam = 1
+        
+        index = torch.randperm(self.cfg.BATCH_SIZE).to(self.device)
+        mixed_x = lam * x + (1 - lam) * x[index:]
+        y_a, y_b = y, y[index]
+        return mixed_x, y_a, y_b, lam
+
+
     def _train_one_epoch( self ) -> None :
         self.model.train()
         train_loss_list = []
@@ -70,9 +84,15 @@ class TRAINER() :
             
             self.optimizer.zero_grad()
             
-            output = self.model(imgs)
-            loss = self.criterion(output, labels)
-            
+            if np.random.random() > 0.5: # mixup 작동 확률
+                imgs, target_a, target_b, lam = self.mixup_data(imgs, labels)
+
+                output = self.model(imgs)
+                loss = self.criterion(output, target_a) * lam + self.criterion(output, target_b) * (1 - lam)
+            else:
+                output = self.model(imgs)
+                loss = self.criterion(output, labels)
+        
             preds.append(output.argmax(1).data)                
             true_labels.append(labels.data)
 
@@ -151,7 +171,7 @@ class TRAINER() :
             if self.scheduler is not None and self.cfg.SCHEDULER != 'cosinewarmup':
                 self.scheduler.step()
 
-            print( " [ epoch : {:03d} ]  train_loss : {:0.03f}, train_score : {:0.03f}, val_loss : {:0.03f}, val_score : {:0.03f}, max_val_score : {:0.03f} ".format(
+            print( " [ epoch : {:03d} ]  train_loss : {:0.03f}, val_loss : {:0.03f}, val_score : {:0.03f}, max_val_score : {:0.03f} ".format(
                 i+1,
                 self.train_loss,
                 self.train_score,

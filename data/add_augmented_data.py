@@ -144,6 +144,7 @@ if __name__ == "__main__":
     # noise_image(['/home/mooooongni/사진/증명사진.jpg'])
     (options, args) = parser.parse_args()
     print(options)
+
     path_list = select_dir(options.path, options.numfiles)    
     if options.all:
         random_crop(path_list, options.crop_rate)
