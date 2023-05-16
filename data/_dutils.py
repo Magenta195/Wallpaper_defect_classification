@@ -3,7 +3,7 @@ import unicodedata
 import glob
 import os 
 
-from torch.utils.data import DataLoader, random_split, Subset, Dataset
+from torch.utils.data import DataLoader, random_split, Subset, Dataset, Sampler
 from torchvision.datasets import ImageFolder
 
 from utils import CONFIG
@@ -18,6 +18,7 @@ def get_dataloader(
         img_path_list : Optional[List[str]] = None,
         label_list : Optional[List[str]] = None,
         dataset : Optional[Dataset] = None,
+        sampler : Optional[Sampler] = None
     ) -> DataLoader :
     
     if mode not in mode_list :
@@ -25,10 +26,8 @@ def get_dataloader(
     
     if mode == 'train' :
         transform = train_transforms( cfg = cfg )
-        shuffle = True
     else :
         transform = test_transforms( cfg = cfg )
-        shuffle = False
 
     if dataset is None :
         dataset = WallPaperDataset(
@@ -40,8 +39,9 @@ def get_dataloader(
     return DataLoader(
         dataset = dataset,
         batch_size = cfg.BATCH_SIZE,
-        shuffle = shuffle,
-        num_workers = cfg.NUM_WORKER
+        shuffle = False,
+        num_workers = cfg.NUM_WORKER,
+        sampler = sampler
     )
 
 def get_data_list(

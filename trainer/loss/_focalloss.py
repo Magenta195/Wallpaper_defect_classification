@@ -121,10 +121,10 @@ def focal_loss(input, target, label_smooth, smooth_alpha, alpha, gamma, reductio
     elif isinstance(alpha, np.ndarray):
         alpha = torch.from_numpy(alpha)
         # alpha : (B, C, H, W)
-        alpha = alpha.view(-1, len(alpha), 1, 1).expand_as(input)
+        alpha = alpha.expand_as(input)
     elif isinstance(alpha, torch.Tensor):
         # alpha : (B, C, H, W)
-        alpha = alpha.view(-1, len(alpha), 1, 1).expand_as(input)       
+        alpha = alpha.expand_as(input)       
         
 
     # compute softmax over the classes axis
@@ -140,7 +140,7 @@ def focal_loss(input, target, label_smooth, smooth_alpha, alpha, gamma, reductio
 
     # compute the actual focal loss
     weight = torch.pow(1.0 - input_soft, gamma)
-    
+
     # alpha, weight, input_soft : (B, C, H, W)
     # focal : (B, C, H, W)
     focal = -alpha * weight * torch.log(input_soft)
@@ -212,3 +212,27 @@ class FocalLoss(nn.Module):
 
     def forward(self, input, target):
         return focal_loss(input, target, self.label_smooth, self.smooth_alpha, self.alpha, self.gamma, self.reduction, self.eps, self.ignore_index)
+    
+if __name__ == "__main__":
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+
+    # 5개 feature를 가진 20개 샘플
+    torch.manual_seed(42)
+    X = torch.randn((20, 5))
+    y = torch.randint(0, 5, size=(20,))
+
+    counter = [0] * 5
+    for label in y:
+        counter[label] += 1
+    normedWeight = torch.FloatTensor([1 - (c / sum(counter)) for c in counter])
+
+    lin = nn.Linear(X.size(1), 5)
+    output = lin(X)
+    criterion = FocalLoss(alpha=normedWeight)
+    loss = criterion(output, y)
+    print(normedWeight)
+    print(y)
+    print(output.argmax(1))
+    print(loss)
