@@ -66,8 +66,8 @@ class TRAINER() :
         else:
             lam = 1
         
-        index = torch.randperm(self.cfg.BATCH_SIZE).to(self.device)
-        mixed_x = lam * x + (1 - lam) * x[index:]
+        index = torch.randperm(x.size(0)).to(self.device)
+        mixed_x = lam * x + (1 - lam) * x[index, :]
         y_a, y_b = y, y[index]
         return mixed_x, y_a, y_b, lam
 
