@@ -33,7 +33,6 @@ class CONFIG :
     EPOCHS = 20
     LEARNING_RATE = 3e-4
     BATCH_SIZE = 8
-    SEED = 41
     PATIENCE = 4
 
     ## config for model learning setting
