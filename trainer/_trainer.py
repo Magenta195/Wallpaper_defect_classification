@@ -63,7 +63,9 @@ class TRAINER() :
             transforms.RandomRotation(30),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomVerticalFlip(p=0.5),
-            transforms.RandomApply(transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.1, hue=0), p=0.5),
+            transforms.RandomApply(nn.ModuleList([
+                transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.1, hue=0)
+            ]), p=0.5),
         ])
 
 
