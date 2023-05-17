@@ -56,7 +56,7 @@ def label_to_one_hot_label(
     
     return ret
 
-def ce_loss(input, target, label_smooth, smooth_alpha, reduction, eps, ignore_index):
+def ce_loss(input, target, label_smooth, smooth_alpha, alpha, reduction, eps, ignore_index):
     if not isinstance(input, torch.Tensor):
         raise TypeError(f"Input type is not a torch.Tensor. Got {type(input)}")
 
@@ -79,7 +79,17 @@ def ce_loss(input, target, label_smooth, smooth_alpha, reduction, eps, ignore_in
 
     if not input.device == target.device:
         raise ValueError(f"input and target must be in the same device. Got: {input.device} and {target.device}")   
-        
+    
+    if isinstance(alpha, float):
+        pass
+    elif isinstance(alpha, np.ndarray):
+        alpha = torch.from_numpy(alpha)
+        # alpha : (B, C, H, W)
+        alpha = alpha.expand_as(input)
+    elif isinstance(alpha, torch.Tensor):
+        # alpha : (B, C, H, W)
+        alpha = alpha.expand_as(input)       
+
     # compute softmax over the classes axis
     # input_soft : (B, C, H, W)
     input_soft = F.softmax(input, dim=1) + eps
@@ -92,7 +102,7 @@ def ce_loss(input, target, label_smooth, smooth_alpha, reduction, eps, ignore_in
 
     # alpha, weight, input_soft : (B, C, H, W)
     # focal : (B, C, H, W)
-    celoss = -torch.log(input_soft)
+    celoss = -alpha * torch.log(input_soft)
     
     # loss_tmp : (B, H, W)
     loss_tmp = torch.sum(target_one_hot * celoss, dim=1)
@@ -112,13 +122,14 @@ def ce_loss(input, target, label_smooth, smooth_alpha, reduction, eps, ignore_in
 
 
 class CELoss(nn.Module):
-    def __init__(self, label_smooth = False, smooth_alpha = 0.02, reduction = 'mean', eps = 1e-8, ignore_index=30):
+    def __init__(self, label_smooth = False, smooth_alpha = 0.02, alpha = 1., reduction = 'mean', eps = 1e-8, ignore_index=30):
         super().__init__()
         self.label_smooth = label_smooth
         self.smooth_alpha = smooth_alpha
+        self.alpha = alpha
         self.reduction = reduction
         self.eps = eps
         self.ignore_index = ignore_index
 
     def forward(self, input, target):
-        return ce_loss(input, target, self.label_smooth, self.smooth_alpha, self.reduction, self.eps, self.ignore_index)
+        return ce_loss(input, target, self.label_smooth, self.smooth_alpha, self.alpha, self.reduction, self.eps, self.ignore_index)
