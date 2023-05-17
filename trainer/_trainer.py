@@ -127,7 +127,7 @@ class TRAINER() :
                 
                 val_loss_list.append(loss.item())
         
-        self.cur_score = self.score_func(true_labels, preds, device=self.device, cfg=self.cfg, average = 'weighted')
+        self.val_score = self.score_func(true_labels, preds, device=self.device, cfg=self.cfg, average = 'weighted')
         self.val_loss = np.mean(val_loss_list)
 
     def _is_best_model( self ) -> bool :
