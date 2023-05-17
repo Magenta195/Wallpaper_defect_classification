@@ -6,7 +6,7 @@ import numpy as np
 
 from utils import CONFIG
 from ._dset import *
-from ._argumentation import *
+from ._augumentation import *
 from ._dutils import *
 
 __all__ = [WallPaperDataset]

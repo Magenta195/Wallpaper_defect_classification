@@ -9,6 +9,7 @@ import torch.optim as optim
 import torch.nn as nn
 import torch
 from torch.utils.data import DataLoader
+from torchvision import transforms
 
 from utils import CONFIG
 from ._optimizer import _get_optimizer
@@ -58,6 +59,13 @@ class TRAINER() :
 
         self.model.to(self.device)
 
+        self.train_transform = transforms.Compose([
+            transforms.RandomRotation(30),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomVerticalFlip(p=0.5),
+            transforms.RandomApply(transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.1, hue=0), p=0.5),
+        ])
+
 
     def mixup_data(self, x, y, alpha=1.0) -> Tuple[torch.Tensor, int, int, float]:
         """Returns mixed inputs, pairs of targets, and lambda"""
@@ -81,23 +89,30 @@ class TRAINER() :
         for idx, (imgs, labels) in enumerate(tqdm(self.trainloader)):
             imgs = imgs.to(self.device)
             labels = labels.to(self.device)
-            
-            self.optimizer.zero_grad()
-            
-            if np.random.random() > 0.5: # mixup 작동 확률
-                imgs, target_a, target_b, lam = self.mixup_data(imgs, labels)
 
-                output = self.model(imgs)
-                loss = self.criterion(output, target_a) * lam + self.criterion(output, target_b) * (1 - lam)
-            else:
-                output = self.model(imgs)
-                loss = self.criterion(output, labels)
+            self.optimizer.zero_grad()
+
+            # data augmentation
+            auged_imgs = []
+            auged_label = []
+            for img, label in zip(imgs, labels):
+                auged_imgs.append(self.train_transform(img))                
+                auged_label.append(label)
+
+            imgs = torch.stack((*imgs, *auged_imgs), dim=0).to(self.device)
+            labels = torch.stack((*labels, *auged_label), dim=0).to(self.device)
+            
+            # mixup
+            imgs, target_a, target_b, lam = self.mixup_data(imgs, labels)
+            output = self.model(imgs)
+            loss = self.criterion(output, target_a) * lam + self.criterion(output, target_b) * (1 - lam)
         
             preds.append(output.argmax(1).data)                
             true_labels.append(labels.data)
 
             loss.backward()
             self.optimizer.step()
+
             if self.cfg.SCHEDULER == 'cosinewarmup' :
                 self.scheduler.step(self.cur_epoch + idx / len(self.trainloader))
             
