@@ -6,7 +6,7 @@ from optparse import OptionParser, OptionGroup
 import numpy as np
 import PIL
 from PIL import Image
-
+from tqdm import tqdm
 
 def save_file(image:PIL.Image, path:str, title:str):
     dir_path = os.path.dirname(path)
@@ -16,7 +16,7 @@ def save_file(image:PIL.Image, path:str, title:str):
 
 def random_crop(path_list:List[str], crop_rate:float=0.7):
     """This function replicates the random crop process"""
-    for path in path_list:
+    for path in tqdm(path_list):
         image = np.asarray(Image.open(path))
         img_size = image.shape
         # extracting channels
@@ -45,7 +45,7 @@ def noise_image(path_list:List[str], noise_intensity:float=0.2):
     """This function replicates the image noising process"""
     noise_threshold = 1 - noise_intensity
 
-    for path in path_list:
+    for path in tqdm(path_list):
         image = np.asarray(Image.open(path))
         img_size = image.shape
         flatten_size = img_size[0] * img_size[1]
