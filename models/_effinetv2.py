@@ -20,12 +20,22 @@ class BaseModel(nn.Module):
     ):
         super(BaseModel, self).__init__()
         self.backbone = eff_model_v2_dict[ model_num ]( weights = eff_model_v2_dict[ model_num + '_weight' ] if pretrained else None )
-        self.classifier = nn.Linear(1000, num_classes)
-        
+        self.classifier = nn.Sequential(
+            nn.Linear(1000, 512),
+            nn.ReLU(True),
+            nn.Dropout(),
+            nn.Linear(512, 512),
+            nn.ReLU(True),
+            nn.Dropout(),
+            nn.Linear(512, num_classes)
+        )
+
+
     def forward(self, x):
         x = self.backbone(x)
         x = self.classifier(x)
         return x
+
     
 def _get_effinetv2_models(
         num_classes : int = 19,
