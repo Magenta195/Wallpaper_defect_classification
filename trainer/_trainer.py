@@ -90,15 +90,8 @@ class TRAINER() :
 
             self.optimizer.zero_grad()
             
-            lam = np.random.beta(1.0, 1.0)
-            rand_index = torch.randperm(imgs.size()[0]).to(self.device)
-            target_a = labels
-            target_b = labels[rand_index]            
-            bbx1, bby1, bbx2, bby2 = rand_bbox(imgs.size(), lam)
-            imgs[:, :, bbx1:bbx2, bby1:bby2] = imgs[rand_index, :, bbx1:bbx2, bby1:bby2]
-            lam = 1 - ((bbx2 - bbx1) * (bby2 - bby1) / (imgs.size()[-1] * imgs.size()[-2]))
             outputs = self.model(imgs)
-            loss = self.criterion(outputs, target_a) * lam + self.criterion(outputs, target_b) * (1. - lam)
+            loss = self.criterion(outputs, labels)
                 
             # self.optimizer.zero_grad()
             
