@@ -9,6 +9,7 @@ import torch.optim as optim
 import torch.nn as nn
 import torch
 from torch.utils.data import DataLoader
+from torchvision import transforms
 
 from utils import CONFIG
 from ._optimizer import _get_optimizer
@@ -59,6 +60,14 @@ class TRAINER() :
 
         self.model.to(self.device)
 
+        self.train_transform = transforms.Compose([
+            transforms.RandomRotation(30),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomVerticalFlip(p=0.5),
+            transforms.RandomApply(nn.ModuleList([
+                transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.1, hue=0)
+            ]), p=0.5),
+        ])
 
     def _train_one_epoch( self ) -> None :
         self.model.train()
@@ -67,27 +76,30 @@ class TRAINER() :
         self.train_loss = 0
 
         for idx, (imgs, labels) in enumerate(tqdm(self.trainloader)):
-            beta = 1.0
             imgs = imgs.to(self.device)
             labels = labels.to(self.device)
             
+            auged_imgs = []
+            auged_label = []
+            for img, label in zip(imgs, labels):
+                auged_imgs.append(self.train_transform(img))                
+                auged_label.append(label)
+
+            imgs = torch.stack((*imgs, *auged_imgs), dim=0).to(self.device)
+            labels = torch.stack((*labels, *auged_label), dim=0).to(self.device)
+
             self.optimizer.zero_grad()
             
-            if beta > 0 and np.random.random()>0.5: # cutmix 작동될 확률      
-                lam = np.random.beta(1.0, 1.0)
-                rand_index = torch.randperm(imgs.size()[0]).to(self.device)
-                target_a = labels
-                target_b = labels[rand_index]            
-                bbx1, bby1, bbx2, bby2 = rand_bbox(imgs.size(), lam)
-                imgs[:, :, bbx1:bbx2, bby1:bby2] = imgs[rand_index, :, bbx1:bbx2, bby1:bby2]
-                lam = 1 - ((bbx2 - bbx1) * (bby2 - bby1) / (imgs.size()[-1] * imgs.size()[-2]))
-                outputs = self.model(imgs)
-                loss = self.criterion(outputs, target_a) * lam + self.criterion(outputs, target_b) * (1. - lam)
+            lam = np.random.beta(1.0, 1.0)
+            rand_index = torch.randperm(imgs.size()[0]).to(self.device)
+            target_a = labels
+            target_b = labels[rand_index]            
+            bbx1, bby1, bbx2, bby2 = rand_bbox(imgs.size(), lam)
+            imgs[:, :, bbx1:bbx2, bby1:bby2] = imgs[rand_index, :, bbx1:bbx2, bby1:bby2]
+            lam = 1 - ((bbx2 - bbx1) * (bby2 - bby1) / (imgs.size()[-1] * imgs.size()[-2]))
+            outputs = self.model(imgs)
+            loss = self.criterion(outputs, target_a) * lam + self.criterion(outputs, target_b) * (1. - lam)
                 
-            else:
-                outputs = self.model(imgs)
-                loss = self.criterion(outputs, labels) 
-            
             # self.optimizer.zero_grad()
             
             # output = self.model(imgs)
