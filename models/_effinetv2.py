@@ -24,9 +24,6 @@ class BaseModel(nn.Module):
             nn.Linear(1000, 512),
             nn.ReLU(True),
             nn.Dropout(),
-            nn.Linear(512, 512),
-            nn.ReLU(True),
-            nn.Dropout(),
             nn.Linear(512, num_classes)
         )
 
