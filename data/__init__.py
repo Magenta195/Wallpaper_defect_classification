@@ -79,7 +79,7 @@ def get_kfold_dataloader(
 
     dataloader_dict = dict()
     datalist_dict = dict()
-    kfold = StratifiedKFold(n_splits = cfg.KFOLD, random_state = cfg.SEED)
+    kfold = StratifiedKFold(n_splits = cfg.KFOLD, random_state = cfg.SEED, shuffle=True)
     # Only use torchvision.datasets.ImageFolder
   
     for mode in ['train', 'test'] :
