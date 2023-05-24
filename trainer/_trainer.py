@@ -16,7 +16,9 @@ from ._optimizer import _get_optimizer
 from ._scheduler import _get_scheduler
 from ._metric import _get_loss_func, _get_score_func
 
+
 class TRAINER() :
+    
     def __init__( self, 
         model : nn.Module,
         dataloaders : DataLoader, 
@@ -69,7 +71,7 @@ class TRAINER() :
         ])
 
 
-    def mixup_data(self, x, y, alpha=1.0) -> Tuple[torch.Tensor, int, int, float]:
+    def mixup_data(self, x: torch.Tensor, y: torch.Tensor, alpha: float=1.0) -> Tuple[torch.Tensor, int, int, float]:
         """Returns mixed inputs, pairs of targets, and lambda"""
         if alpha > 0:
             lam = np.random.beta(alpha, alpha)
@@ -147,18 +149,21 @@ class TRAINER() :
         self.val_score = self.score_func(true_labels, preds, device=self.device, cfg=self.cfg, average = 'weighted')
         self.val_loss = np.mean(val_loss_list)
 
+    
     def _is_best_model( self ) -> bool :
         if self.cfg.METRIC_SCOPE == 'score' :
             return self.val_score > self.best_score
         else :
             return self.val_loss < self.best_score
     
+
     def _cur_metric( self ) -> float :
         if self.cfg.METRIC_SCOPE == 'score' :
             return self.val_score
         else :
             return self.val_loss
 
+    
     def _save_best_model( self ) -> None :
         if self._is_best_model() :
             torch.save(self.model, self.MODEL_SAVE_PATH)
