@@ -2,7 +2,7 @@ import torchvision.models as models
 import torch.nn as nn
 
 
-eff_model_v2_dict = {
+MODEL_DICT = {
     'v2_s' : models.efficientnet_v2_s,
     'v2_s_weight' : models.EfficientNet_V2_S_Weights,
     'v2_m' : models.efficientnet_v2_m,
@@ -10,16 +10,21 @@ eff_model_v2_dict = {
     'v2_l' : models.efficientnet_v2_l,
     'v2_l_weight' : models.EfficientNet_V2_L_Weights,
 }
+
+
 class BaseModel(nn.Module):
     def __init__(
         self, 
-        num_classes : int = 19,
-        pretrained : bool = True,
-        model_num : str = 'b0',
+        num_classes: int = 19,
+        pretrained: bool = True,
+        model_num: str = 'b0',
         **kwargs
     ):
         super(BaseModel, self).__init__()
-        self.backbone = eff_model_v2_dict[ model_num ]( weights = eff_model_v2_dict[ model_num + '_weight' ] if pretrained else None )
+        self.backbone = MODEL_DICT[model_num](
+            weights = MODEL_DICT[model_num + '_weight'] if pretrained else None,
+            **kwargs
+        )
         self.classifier = nn.Linear(1000, num_classes)
         
     def forward(self, x):
@@ -27,13 +32,15 @@ class BaseModel(nn.Module):
         x = self.classifier(x)
         return x
     
+    
 def _get_effinetv2_models(
-        num_classes : int = 19,
-        pretrained : bool = True,
-        model_num : str = 'v2_s',
+        num_classes: int = 19,
+        pretrained: bool = True,
+        model_num: str = 'v2_s',
         **kwargs
-    ) -> nn.Module :
-    if model_num not in eff_model_v2_dict :
+    ) -> nn.Module:
+    """This function return CNN model"""
+    if model_num not in MODEL_DICT:
         raise NotImplementedError("Invaild Model")
     
     return BaseModel(
@@ -42,5 +49,3 @@ def _get_effinetv2_models(
         model_num = model_num,
         **kwargs,
     )
-
-

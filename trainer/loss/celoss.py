@@ -1,18 +1,19 @@
+from typing import Optional, Union
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
-from typing import Optional
 
 
 def label_to_one_hot_label(
-    labels: torch.Tensor,
-    num_classes: int,
-    device: Optional[torch.device] = None,
-    dtype: Optional[torch.dtype] = None,
-    eps: float = 1e-6,
-    ignore_index = 255,
-) -> torch.Tensor:
+        labels: torch.Tensor,
+        num_classes: int,
+        device: Optional[torch.device] = None,
+        dtype: Optional[torch.dtype] = None,
+        eps: float = 1e-6,
+        ignore_index: int = 255,
+    ) -> torch.Tensor:
     r"""
     Convert an integer label x-D tensor to a one-hot (x+1)-D tensor.
 
@@ -56,7 +57,17 @@ def label_to_one_hot_label(
     
     return ret
 
-def ce_loss(input, target, label_smooth, smooth_alpha, alpha, reduction, eps, ignore_index):
+
+def ce_loss(
+        input: torch.Tensor, 
+        target: torch.Tensor, 
+        label_smooth: bool, 
+        smooth_alpha: float, 
+        alpha: Union[float, np.ndarray, torch.Tensor], 
+        reduction: str, 
+        eps: float, 
+        ignore_index: int
+    ) -> float:
     if not isinstance(input, torch.Tensor):
         raise TypeError(f"Input type is not a torch.Tensor. Got {type(input)}")
 
@@ -96,9 +107,15 @@ def ce_loss(input, target, label_smooth, smooth_alpha, alpha, reduction, eps, ig
     
     # create the labels one hot tensor
     # target_one_hot : (B, C, H, W)
-    target_one_hot = label_to_one_hot_label(target.long(), num_classes=input.shape[1], device=input.device, dtype=input.dtype, ignore_index=ignore_index)
-    if label_smooth :
-        target_one_hot = target_one_hot * ( 1 - smooth_alpha ) + smooth_alpha / input.shape[1]
+    target_one_hot = label_to_one_hot_label(
+        target.long(), 
+        num_classes=input.shape[1], 
+        device=input.device, 
+        dtype=input.dtype, 
+        ignore_index=ignore_index
+    )
+    if label_smooth:
+        target_one_hot = target_one_hot*(1-smooth_alpha) + smooth_alpha/input.shape[1]
 
     # alpha, weight, input_soft : (B, C, H, W)
     # focal : (B, C, H, W)
@@ -122,7 +139,7 @@ def ce_loss(input, target, label_smooth, smooth_alpha, alpha, reduction, eps, ig
 
 
 class CELoss(nn.Module):
-    def __init__(self, label_smooth = False, smooth_alpha = 0.02, alpha = 1., reduction = 'mean', eps = 1e-8, ignore_index=30):
+    def __init__(self, label_smooth=False, smooth_alpha=0.02, alpha=1., reduction='mean', eps=1e-8, ignore_index=30):
         super().__init__()
         self.label_smooth = label_smooth
         self.smooth_alpha = smooth_alpha
@@ -132,4 +149,13 @@ class CELoss(nn.Module):
         self.ignore_index = ignore_index
 
     def forward(self, input, target):
-        return ce_loss(input, target, self.label_smooth, self.smooth_alpha, self.alpha, self.reduction, self.eps, self.ignore_index)
+        return ce_loss(
+            input, 
+            target, 
+            self.label_smooth, 
+            self.smooth_alpha, 
+            self.alpha, 
+            self.reduction, 
+            self.eps, 
+            self.ignore_index
+        )

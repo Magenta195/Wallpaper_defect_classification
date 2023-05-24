@@ -13,7 +13,8 @@ def f1_score(
         cfg: Type[CONFIG],
         average: str = 'weighted',
         **kwargs
-) -> float:
+    ) -> float:
+    """This function get F1 score"""
     metric = MulticlassF1Score(cfg.NUM_CLASSES, average=average)
     metric.to(device)
     labels = torch.cat(labels, dim=0)
@@ -23,7 +24,6 @@ def f1_score(
     return score.item()
 
 
-# test
 if __name__ == "__main__":
     import torch.nn as nn
 

@@ -8,17 +8,19 @@ import PIL
 from PIL import Image
 
 
-def save_file(image:PIL.Image, path:str, title:str):
+def save_file(image: Image, path: str, title: str) -> None:
+    """Save augmented image file"""
     dir_path = os.path.dirname(path)
     file_name = path.split('/')[-1]
     image.save(os.path.join(dir_path, title+'_'+file_name))
 
 
-def random_crop(path_list:List[str], crop_rate:float=0.7):
+def random_crop(path_list: List[str], crop_rate: float=0.7) -> None:
     """This function replicates the random crop process"""
     for path in path_list:
         image = np.asarray(Image.open(path))
         img_size = image.shape
+
         # extracting channels
         channel_0, channel_1, channel_2 = image[:,:,0], image[:,:,1], image[:,:,2]
 
@@ -41,7 +43,7 @@ def random_crop(path_list:List[str], crop_rate:float=0.7):
         save_file(image, path, 'cropped')    
 
 
-def noise_image(path_list:List[str], noise_intensity:float=0.2):
+def noise_image(path_list: List[str], noise_intensity: float=0.2) -> None:
     """This function replicates the image noising process"""
     noise_threshold = 1 - noise_intensity
 
@@ -90,8 +92,9 @@ def noise_image(path_list:List[str], noise_intensity:float=0.2):
         save_file(image, path, 'noise')
 
 
-def select_dir(path:str, num_files:int):
+def select_dir(path: str, num_files: int) -> List[str]:
     """Select directories from limited conditions"""
+    # Check validation of path
     if not os.path.isdir(path):
         raise ValueError('Invalid Path')
     
@@ -99,19 +102,18 @@ def select_dir(path:str, num_files:int):
     dir_list = os.listdir(path)
     for dirname in dir_list:
         cur_path = os.path.join(path, dirname)
-        
+        # pass if current path is not valid
         if not os.path.isdir(cur_path):
             continue
         
         files = os.listdir(cur_path)
-
         if len(files) < num_files:
             path_list += [os.path.join(cur_path, filename) for filename in files]
     
     return path_list
 
 
-# setting options
+# Setting options
 parser = OptionParser()
 parser.add_option("-p", "--path", type="string",
                 help="Root path having some directories to augmentate")
@@ -140,10 +142,9 @@ parser.add_option_group(noise_option)
 
 
 if __name__ == "__main__":
-    # random_crop(['/home/mooooongni/사진/증명사진.jpg'])
-    # noise_image(['/home/mooooongni/사진/증명사진.jpg'])
     (options, args) = parser.parse_args()
     print(options)
+
     path_list = select_dir(options.path, options.numfiles)    
     if options.all:
         random_crop(path_list, options.crop_rate)
