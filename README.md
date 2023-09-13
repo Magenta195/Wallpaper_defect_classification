@@ -40,11 +40,30 @@
 
 # 🗝️ Key Service
 
-💡 사용자는 passerby 웹 및 모바일 환경에 접속하여 **전체 공개수배자 신상정보**를 확인할 수 있습니다.
+💡 EDA 결과 총 19개의 클래스를 가진 비대칭 데이터(Unbalanced Data)로 확인  
 
-💡 또한, 공개수배자 정보와 대조하여 바로 제보 및 신고할 수 있도록 **관련 안내 정보**를 제공합니다.
+💡 비대칭 데이터의 분류 모델 학습을 위한 다양한 기법 사용
 
-💡 관리자는 passerby db를 통하여 공개수배자 **생성, 조회**, 이미지 및 비디오, 신상정보의 **수정, 삭제**를 수행할 수 있습니다.
+| 적용한 기법 | 기대 효과 | 
+|:---:|:---:|
+|CutMix|다수 클래스에 대한 과적합을 방지하며 소수 클래스에 대해서 적절한 결정경계를 가지는 모델 학습|
+|Focal Loss|easy class에 대한 손실값을 낮추고 hard class에 대한 손실값을 높여 소수 클래스에 대한 가중치 변경 유도|
+|Weighted Random Sampling|매 배치 마다 19개 클래스에 대한 비교적 균등한 샘플링을 진행|
+
+💡 다양한 capacity를 가진 CNN 네트워크의 transfer learning 성능을 비교하여 최적의 모델을 찾고 하이퍼파라미터 튜닝을 통해 Best Model 작성
+| 모델 계열 중 Best | Weighted F1 Score|
+|:---:|:---:|
+|ResNet-152|0.5648913541|
+|DenseNet161|0.5681891560|
+|InceptionNet-v3|0.5740491055|
+|EfficientNet-v2m|0.61043914185|
+
+**Best Model**
+- EfficientNet-v2m 모델 3개 배깅 앙상블
+- Focal loss (label smooth)
+- CutMix 적용
+- learning rate: 7e-4
+- exponetial scheduler: gamma=0.8
 
 &nbsp;
 
@@ -111,27 +130,6 @@
 ├── 📄 readme.md
 └── 📄 requirements.txt
 ```
-&nbsp;
-
-# 📚 API docs
-
-👉 자세한 request 및 response 문법은 백엔드 내 swagger 및 redoc 문서를 참조해 주세요! (추후 문서분리 예정)
-
-
-|Router|Method|Endpoint|Description|
-|---|---|---|---|
-| admin | `POST` | `/admin` | 지명수배자 정보 및 이미지 DB에 등록 |
-| admin | `PUT` | `/admin/data` | 해당 id의 지명수배자 신상정보 데이터 변경 |
-| admin | `PUT` | `/admin/image` | 해당 id의 지명수배자 이미지 변경 및 비디오 재생성 |
-| admin | `PUT` | `/admin/video` | 해당 id의 지명수배자 비디오 재생성 |
-| dl_server | `POST` | `/dl/video` | 해당 id의 생성된 지명수배자 비디오 경로 DB에 등록 |
-| dl_server | `PUT` | `/dl/video` | 해당 id의 재생성된 지명수배자 비디오 경로 DB에 수정 |
-| wanted | `GET` | `/wanted` | 보유하고 있는 전체 지명수배자 데이터 및 그 해시값 전송 |
-| wanted | `GET` | `/wanted/{id}` | 해당 id의 지명수배자 데이터 전송 |
-| wanted | `GET` | `/wanted/check/{data_hash}` | 데이터 해쉬 비교를 통해 프론트엔드 데이터의 유효성 검증 |
-
-
-
 &nbsp;
 
 # 📝 Tutorial
